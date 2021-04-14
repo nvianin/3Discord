@@ -32,7 +32,7 @@ chrome.extension.sendMessage({}, function (response) {
 					deletedControls = true;
 				}
 			}
-			if (!deletedControls) deleteControls();
+			/* if (!deletedControls) deleteControls(); */
 
 			/* if (!deletedControls) {
 				let controlsDeletionInterval = setInterval(() => {
@@ -200,6 +200,13 @@ function createInterface() {
 	stage.classList.add("stage")
 	chat.appendChild(stage);
 
+	// Add Event Listeners to Stage
+	stage.addEventListener('click', function () {
+		console.log("ADSGASDGASDG")
+		groundMat.uniforms.isEditingGround.value = !groundMat.uniforms.isEditingGround.value;
+
+	})
+
 	// Create Maximize Button
 	let button = document.createElement('div');
 	button.onclick = toggleInterface;
@@ -252,7 +259,21 @@ function cleanFrame() {
 	}
 }
 
-let frameCount = 0;
+let frameCount = time = 0;
+let prevDims = {
+	x: 0,
+	y: 0
+}
+const resize = () => {
+	/* console.log(stage.offsetWidth, stage.offsetHeight) */
+	camera.aspect = stage.offsetWidth / stage.offsetHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(stage.offsetWidth, stage.offsetHeight);
+}
+let mouse = {
+	x: 0,
+	y: 0
+}
 
 render();
 
@@ -263,4 +284,25 @@ function render() {
 		videos[i].style.left = Math.cos(frameCount * .01 + i * 40) * videos[i].parentElement.offsetWidth / 2 + videos[i].parentElement.offsetWidth / 2 + "px"
 	}
 	requestAnimationFrame(render);
+
+	if (prevDims.x != window.innerWidth || prevDims.y != window.innerHeight) resize()
+
+	if (renderer != undefined) {
+		renderer.render(scene, camera);
+	}
+
+	raycaster.setFromCamera(normalized_mouse, camera);
+	const intersects = raycaster.intersectObjects([ground]);
+	console.log(intersects[0].point.x, intersects[0].point.y);
+	mouse.x = intersects[0].point.x;
+	mouse.y = intersects[0].point.y;
+
+
+	ground.onBeforeRender = () => {
+		groundMat.uniforms.mousePos.value.x = intersects[0].point.x;
+		groundMat.uniforms.mousePos.value.y = intersects[0].point.y;
+	}
+
+	prevDims.x = window.innerWidth;
+	prevDims.y = window.innerHeight;
 }
