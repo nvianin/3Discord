@@ -1,0 +1,42 @@
+/**
+ * Place your custom CSS styles here.
+ **/
+
+.custom_video {
+    position: absolute;
+    z-index: 1000;
+    top: 200px;
+    left: 200px;
+    width: 100px;
+    height: 100px;
+    opacity: 100%;
+    border-radius: 5000px;
+    object-fit: cover;
+}
+
+.stage {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    background-color: white;
+    z-index: 99;
+}
+
+.fullscreenButton {
+    position: absolute;
+    display: block;
+    z-index: 100;
+    width: 20px;
+    height: 20px;
+    top: 15px;
+    right: 15px;
+    border-radius: 150px;
+    background-image: radial-gradient(white, black)
+}
+
+.fullscreenButton:hover {
+    cursor: pointer;
+    background-image: radial-gradient(black, white)
+}
