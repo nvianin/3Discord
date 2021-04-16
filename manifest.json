@@ -29,9 +29,11 @@
         "https://discord.com/*"
       ],
       "js": [
-        "src/inject/inject.js",
+        "tween.cjs.js",
         "three.js",
+        "src/inject/inject.js",
         "src/inject/renderer.js"
+        
       ]
     }
   ]

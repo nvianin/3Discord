@@ -11,7 +11,9 @@ if (stage) {
 }
 
 let scene, camera, renderer;
-let ground;
+let ground, groundShadingMat, groundShadingPlane;
+let ambientLight, light, hemi, rectLight, sun;
+const normalized_mouse = new THREE.Vector2();
 
 const onstage = () => {
     scene = new THREE.Scene();
@@ -27,10 +29,23 @@ const onstage = () => {
     console.log("###########################")
 
     ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20, 1, 1), groundMat);
+    groundShadingPlane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20, 1, 1), groundShadingMat)
+    groundShadingPlane.position.z = -.01;
+
+    ambientLight = new THREE.AmbientLight(0x404040);
+    /* hemi = new THREE.HemisphereLight(0xffffbb, 0x080820, 1) */
+    scene.add(ambientLight);
+    /* scene.add(hemi); */
+    rectLight = new THREE.RectAreaLight(0xffffff, 5, 5, 5);
+    rectLight.position.z = 5;
+    scene.add(rectLight);
+    sun = new THREE.DirectionalLight(0xffffff, .5);
+    scene.add(sun)
 
     camera.position.z = 1
     camera.lookAt(ground.position)
     scene.add(ground);
+    scene.add(groundShadingPlane)
 }
 
 const vertexShader = `
@@ -71,10 +86,11 @@ const groundFS = `uniform vec3 colorA;
 
         float mouseGradient = distance (vUv.xy,mouse)*10.;
         if (isEditingGround){
-            gl_FragColor = vec4(mix(gridColor, vec3(1. - grid), (mouseGradient)), 1.);
+            vec3 color = mix(gridColor, vec3(1. - grid), (mouseGradient));
+            gl_FragColor = vec4(color, 1.-(color.x+color.y+color.z)/3.);
             //gl_FragColor = vec4(mouseGradient);
         } else {
-            gl_FragColor = vec4(vec3(1.-grid), 1.);
+            gl_FragColor = vec4(vec3(1.-grid), grid);
         }
       }`
 
@@ -88,14 +104,11 @@ const groundMat = new THREE.ShaderMaterial({
         }
     },
     vertexShader: vertexShader,
-    fragmentShader: groundFS
+    fragmentShader: groundFS,
+    transparent: true
 })
+groundShadingMat = new THREE.MeshStandardMaterial({
+    color: "#ffffff"
+});
 
 const raycaster = new THREE.Raycaster();
-const normalized_mouse = new THREE.Vector2();
-
-window.onmousemove = e => {
-    normalized_mouse.x = (e.clientX / stage.offsetWidth) * 2 - 1;
-    normalized_mouse.y = (e.clientY / stage.offsetHeight) * 2 - 1;
-
-}

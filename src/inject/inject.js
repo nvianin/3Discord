@@ -3,6 +3,7 @@ var stage, chat;
 let mediastreams = [];
 
 
+
 chrome.extension.sendMessage({}, function (response) {
 	var readyStateCheckInterval = setInterval(function () {
 		if (document.readyState === "complete") {
@@ -157,6 +158,9 @@ function receiveVideoElement(vid) {
 
 	clone.srcObject = vid.srcObject
 	clone.classList.add('custom_video')
+	clone.style.top = stage.offsetHeight / 2 - clone.offsetHeight / 2 + "px";
+	clone.style.left = stage.offsetWidth / 2 - clone.offsetWidth / 2 + "px";
+
 	stage.appendChild(clone);
 
 	/* console.log(clone) */
@@ -203,16 +207,70 @@ function createInterface() {
 	// Add Event Listeners to Stage
 	stage.addEventListener('click', function () {
 		console.log("ADSGASDGASDG")
-		groundMat.uniforms.isEditingGround.value = !groundMat.uniforms.isEditingGround.value;
+		/* groundMat.uniforms.isEditingGround.value = !groundMat.uniforms.isEditingGround.value; */
+		/* if (floor(mouse.x %100)){} */
+
+		camTarget.x = mouse.x-.5;
+		camTarget.y = mouse.y*-1;
+		camTarget.z = 1;
+		/* const coords = {
+			x: 0,
+			y: 0
+		};
+		var camTween = new TWEEN.Tween(coords)
+			.to({
+				x: mouse.x,
+				y: mouse.y
+			}, 400)
+			.onUpdate(() => {
+				console.log(coords);
+			})
+			.start();
+		console.log(camTween);
+		console.log(camera.position)
+		console.log(mouse.x, mouse.y) */
+
 
 	})
 
-	// Create Maximize Button
-	let button = document.createElement('div');
-	button.onclick = toggleInterface;
-	button.classList.add('fullscreenButton');
-	stage.parentElement.appendChild(button);
+	stage.onmousemove = e => {
+		let stageRect = stage.getBoundingClientRect();
+		/* console.log(e.clientX - stageRect.x, e.clientY - stageRect.y) */
+		/* console.log(stageRect.width,stageRect.height) */
 
+		normalized_mouse.x = ((e.clientX - stageRect.x) / stageRect.width) * 2 - 1;
+		normalized_mouse.y = ((e.clientY - stageRect.y) / stageRect.height) * 2 - 1;
+
+		/* normalized_mouse.x = ((e.clientX) / window.innerWidth) * 2 - 1;
+		normalized_mouse.y = ((e.clientY) / window.innerHeight) * 2 - 1; */
+
+		/* console.log(normalized_mouse) */
+		raycaster.setFromCamera(normalized_mouse, camera);
+		const intersects = raycaster.intersectObjects([ground]);
+		/* console.log(intersects) */
+
+		mouse.x = intersects[0].point.x;
+		mouse.x += .5;
+		mouse.y = intersects[0].point.y;
+		/* mouse.y += 1; */
+
+		/* console.log(mouse) */
+
+
+		/* console.log(Math.floor((mouse.x * 100)) % 100, Math.floor((mouse.y * 100) % 100)); */
+
+		ground.onBeforeRender = () => {
+			groundMat.uniforms.mousePos.value.x = mouse.x;
+			groundMat.uniforms.mousePos.value.y = mouse.y;
+		}
+
+		// Create Maximize Button
+		let button = document.createElement('div');
+		button.onclick = toggleInterface;
+		button.classList.add('fullscreenButton');
+		stage.parentElement.appendChild(button);
+
+	}
 }
 
 function toggleInterface() {
@@ -275,14 +333,16 @@ let mouse = {
 	y: 0
 }
 
+let camTarget = new THREE.Vector3(0,0,1);
 render();
+
 
 function render() {
 	frameCount++;
-	for (i in videos) {
+	/* for (i in videos) {
 		videos[i].style.top = Math.sin(frameCount * .01 + i * 40) * videos[i].parentElement.offsetHeight / 2 + videos[i].parentElement.offsetHeight / 2 + "px"
 		videos[i].style.left = Math.cos(frameCount * .01 + i * 40) * videos[i].parentElement.offsetWidth / 2 + videos[i].parentElement.offsetWidth / 2 + "px"
-	}
+	} */
 	requestAnimationFrame(render);
 
 	if (prevDims.x != window.innerWidth || prevDims.y != window.innerHeight) resize()
@@ -291,17 +351,11 @@ function render() {
 		renderer.render(scene, camera);
 	}
 
-	raycaster.setFromCamera(normalized_mouse, camera);
-	const intersects = raycaster.intersectObjects([ground]);
-	console.log(intersects[0].point.x, intersects[0].point.y);
-	mouse.x = intersects[0].point.x;
-	mouse.y = intersects[0].point.y;
-
-
-	ground.onBeforeRender = () => {
-		groundMat.uniforms.mousePos.value.x = intersects[0].point.x;
-		groundMat.uniforms.mousePos.value.y = intersects[0].point.y;
+	if (camTarget != undefined) {
+		camera.position.lerp(camTarget, .1);
+		console.log(camera.position);
 	}
+
 
 	prevDims.x = window.innerWidth;
 	prevDims.y = window.innerHeight;
