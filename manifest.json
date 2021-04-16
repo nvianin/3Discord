@@ -29,7 +29,7 @@
         "https://discord.com/*"
       ],
       "js": [
-        "tween.cjs.js",
+        "tweenjs.js",
         "three.js",
         "src/inject/inject.js",
         "src/inject/renderer.js"

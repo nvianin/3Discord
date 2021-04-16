@@ -158,8 +158,8 @@ function receiveVideoElement(vid) {
 
 	clone.srcObject = vid.srcObject
 	clone.classList.add('custom_video')
-	clone.style.top = stage.offsetHeight / 2 - clone.offsetHeight / 2 + "px";
-	clone.style.left = stage.offsetWidth / 2 - clone.offsetWidth / 2 + "px";
+	clone.style.top = stage.offsetHeight / 2 - clone.offsetHeight / 2-50 + "px";
+	clone.style.left = stage.offsetWidth / 2 - clone.offsetWidth / 2-50 + "px";
 
 	stage.appendChild(clone);
 
@@ -210,7 +210,7 @@ function createInterface() {
 		/* groundMat.uniforms.isEditingGround.value = !groundMat.uniforms.isEditingGround.value; */
 		/* if (floor(mouse.x %100)){} */
 
-		camTarget.x = mouse.x-.5;
+		camTarget.x = mouse.x;
 		camTarget.y = mouse.y*-1;
 		camTarget.z = 1;
 		/* const coords = {
@@ -231,11 +231,18 @@ function createInterface() {
 		console.log(mouse.x, mouse.y) */
 
 
+		//DEBUG MARKER
+
+		/* let cube = new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.1), new THREE.MeshBasicMaterial({color:0xff00ff}));
+		cube.position = new THREE.Vector3(mouse.x, mouse.y, 0);
+		scene.add(cube) */
+
+
 	})
 
 	stage.onmousemove = e => {
 		let stageRect = stage.getBoundingClientRect();
-		/* console.log(e.clientX - stageRect.x, e.clientY - stageRect.y) */
+		console.log(e.clientX - stageRect.x, e.clientY - stageRect.y)
 		/* console.log(stageRect.width,stageRect.height) */
 
 		normalized_mouse.x = ((e.clientX - stageRect.x) / stageRect.width) * 2 - 1;
