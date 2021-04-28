@@ -14,6 +14,25 @@ socket.on('connect', e => {
 	}
 })
 
+const SETTINGS = {
+	grid_x: 20,
+	grid_y: 20
+}
+
+let canCreateWalls = false;
+let wallType = 0; //0 : horizontal, 1 : vertical
+
+function createStats() {
+	var stats = new Stats();
+	stats.setMode(0);
+
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.left = '0';
+	stats.domElement.style.top = '0';
+
+	return stats;
+}
+
 
 
 chrome.extension.sendMessage({}, function (response) {
@@ -26,6 +45,11 @@ chrome.extension.sendMessage({}, function (response) {
 			console.log("Hello. This message was sent from scripts/inject.js");
 			console.log("HEEEEEEEEEEEEHHHH HO")
 			console.log("I'm still here")
+
+
+
+			stats = createStats()
+			document.body.append(stats.domElement);
 
 			var all = document.querySelectorAll('*');
 			let deletedControls = false;
@@ -218,13 +242,11 @@ function createInterface() {
 
 	// Add Event Listeners to Stage
 	stage.addEventListener('click', function () {
-		console.log("ADSGASDGASDG")
+		/* console.log("ADSGASDGASDG") */
 		/* groundMat.uniforms.isEditingGround.value = !groundMat.uniforms.isEditingGround.value; */
 		/* if (floor(mouse.x %100)){} */
 
-		camTarget.x = mouse.x;
-		camTarget.y = mouse.y * -1;
-		camTarget.z = 1;
+
 		/* const coords = {
 			x: 0,
 			y: 0
@@ -241,6 +263,14 @@ function createInterface() {
 		console.log(camTween);
 		console.log(camera.position)
 		console.log(mouse.x, mouse.y) */
+
+		if (canCreateWalls) {
+			let w = new Wall(mouse.x, mouse.y, wallType);
+		} else {
+			camTarget.x = mouse.x;
+			camTarget.y = mouse.y;
+			camTarget.z = 1;
+		}
 
 
 		//DEBUG MARKER
@@ -259,21 +289,28 @@ function createInterface() {
 
 		normalized_mouse.x = ((e.clientX - stageRect.x) / stageRect.width) * 2 - 1;
 		normalized_mouse.y = ((e.clientY - stageRect.y) / stageRect.height) * 2 - 1;
+		normalized_mouse.y *= -1;
 
 		/* normalized_mouse.x = ((e.clientX) / window.innerWidth) * 2 - 1;
 		normalized_mouse.y = ((e.clientY) / window.innerHeight) * 2 - 1; */
 
 		/* console.log(normalized_mouse) */
-		raycaster.setFromCamera(normalized_mouse, camera);
-		const intersects = raycaster.intersectObjects([ground]);
 		/* console.log(intersects) */
 
-		mouse.x = intersects[0].point.x;
 		/* mouse.x += .5; */
-		mouse.y = intersects[0].point.y * -1
+
+
+
+		/* raycaster.setFromCamera(normalized_mouse, camera);
+		const intersects = raycaster.intersectObjects([ground]);
+		mouse.x = intersects[0].point.x;
+		mouse.y = intersects[0].point.y;
 		debugCube.position.x = mouse.x
-		debugCube.position.y = mouse.y
-		console.log(camera.position);
+		debugCube.position.y = mouse.y */
+
+
+
+		/* console.log(camera.position); */
 		/* mouse.y += 1; */
 
 		/* console.log(mouse) */
@@ -385,6 +422,37 @@ function render() {
 	if (camTarget != undefined && camera != undefined) {
 		camera.position.lerp(camTarget, .1);
 		/* console.log(camera.position); */
+	}
+	if (normalized_mouse.x) {
+		raycaster.setFromCamera(normalized_mouse, camera);
+		const intersects = raycaster.intersectObjects([ground]);
+		mouse.x = intersects[0].point.x;
+		mouse.y = intersects[0].point.y;
+		debugCube.position.x = mouse.x
+		debugCube.position.y = mouse.y
+		debugCube.position.z = intersects[0].point.z;
+
+		if (frameCount % 100 == 0) {
+			/* console.log(mouse.x, mouse.y);
+			console.log(mouse.x % (SETTINGS.grid_x / 100)) */
+		}
+		let margin = .02;
+		let coordX = Math.abs(mouse.x) % (SETTINGS.grid_x / 100)
+		let coordY = Math.abs(mouse.y) % (SETTINGS.grid_y / 100)
+		if ((coordX < margin || coordX > SETTINGS.grid_x / 100 - margin)) {
+			document.body.style.cursor = "pointer"
+			canCreateWalls = true;
+			wallType = 0;
+
+		} else if (coordY < margin || coordY > SETTINGS.grid_y / 100 - margin) {
+			document.body.style.cursor = "pointer"
+			canCreateWalls = true;
+			wallType = 1;
+
+		} else {
+			document.body.style.cursor = "default"
+			canCreateWalls = false;
+		}
 	}
 
 

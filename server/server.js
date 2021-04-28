@@ -22,9 +22,9 @@ io.on('connect', socket => {
 
     const c = new Client('Isildur', socket, clients);
     socket.c = c;
-    console.log("·>> " + c.name + " at " + socket.handshake.address);
+    console.log("+>> " + c.name + " @ " + socket.handshake.address);
 
     socket.on('disconnect', e => {
-        console.log("<<·" + socket.c.name + " at " + socket.handshake.address);
+        console.log("<<-" + socket.c.name + " @ " + socket.handshake.address);
     })
 })

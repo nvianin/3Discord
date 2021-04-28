@@ -29,12 +29,13 @@
         "https://discord.com/*"
       ],
       "js": [
+        "stats.min.js",
         "tweenjs.js",
         "socket.io.js",
         "three.js",
         "src/inject/inject.js",
-        "src/inject/renderer.js"
-        
+        "src/inject/renderer.js",
+        "src/inject/wall.js"
       ]
     }
   ]

@@ -39,7 +39,8 @@ const groundFS = `uniform vec3 colorA;
 
       void main() {
         //gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
-        vec2 mouse = vec2(mousePos.x - .5, 1. - mousePos.y - 1.);
+        //vec2 mouse = vec2(mousePos.x - 1., 1. - mousePos.y - 1.);
+        vec2 mouse = vec2(mousePos.x, mousePos.y);
 
         float res = 5.;
         //float grid = step((fract(vUv.x*res)), .0275) + step((fract(vUv.y*res)), .0275);
@@ -82,7 +83,7 @@ groundShadingMat = new THREE.MeshStandardMaterial({
 let debugCube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({
     color: 0xff00aa
 }));
-debugCube.scale.set(.1, .1, .1)
+debugCube.scale.set(.01, .01, .01)
 
 const onstage = () => {
     scene = new THREE.Scene();
@@ -97,7 +98,7 @@ const onstage = () => {
     console.log("3D BACKGROUND INITIALIZED")
     console.log("###########################")
 
-    ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20, 1, 1), groundMat);
+    ground = new THREE.Mesh(new THREE.PlaneGeometry(SETTINGS.grid_x, SETTINGS.grid_y, 1, 1), groundMat);
     groundShadingPlane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20, 1, 1), groundShadingMat)
     groundShadingPlane.position.z = -.01;
     scene.add(groundShadingPlane);
