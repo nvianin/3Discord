@@ -15,6 +15,12 @@
     ],
     "persistent": true
   },
+  "web_accessible_resource":[
+    {
+      "resources":["wall_test.glb, Coop_Space_3.glb"],
+      "matches":["./src/inject/assets/*"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -33,6 +39,8 @@
         "tweenjs.js",
         "socket.io.js",
         "three.js",
+        "src/inject/GLTFLoader.js",
+        "src/inject/avatar.js",
         "src/inject/inject.js",
         "src/inject/renderer.js",
         "src/inject/wall.js"

@@ -10,7 +10,7 @@ class Discord_Observer {
         this.client.on('ready', () => {
             console.log("***BOT READY")
             this.channel = this.initChannel();
-            console.log("***CONNECTED TO: " + this.channel.name + " @ " + this.channel.guild.name);
+            console.log("***BOT CONNECTED TO: " + this.channel.name + " @ " + this.channel.guild.name);
         })
         this.client.login(token);
 
@@ -19,7 +19,7 @@ class Discord_Observer {
         })
 
         this.client.on('voiceStateUpdate', (Old, New) => {
-            console.log(Old, New);
+            /* console.log(Old, New); */
             fs.writeFileSync('voiceStateDebug_old.json', JSON.stringify(Old))
             fs.writeFileSync('voiceStateDebug_new.json', JSON.stringify(New))
         })

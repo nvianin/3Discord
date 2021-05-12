@@ -1,6 +1,15 @@
 const videos = []
 var stage, chat;
 let mediastreams = [];
+
+let username = "null_client"
+
+let avatars = []
+let avatar;
+
+let pageLoaded = false;
+let AttributionCallback = null;
+
 const socket = io('http://localhost:3000', {
 	cors: {
 		origin: "https://discord.com",
@@ -12,7 +21,29 @@ socket.on('connect', e => {
 	for (var i = 0; i < 5; i++) {
 		console.log("CONNECTED TO SERVER " + i);
 	}
+
+	sendAttribution()
+
+	console.log("Emitted message")
+
 })
+
+function sendAttribution() {
+	if (pageLoaded && username != "null_client") {
+		if (AttributionCallback) {
+			clearInterval(AttributionCallback);
+		}
+		socket.emit('id_attribution', {
+			name: username
+		});
+	} else {
+		if (AttributionCallback == null) {
+			AttributionCallback = setInterval(sendAttribution, 300);
+		}
+		console.log("retrying attribution")
+	}
+
+}
 
 const SETTINGS = {
 	grid_x: 20,
@@ -38,6 +69,9 @@ function createStats() {
 chrome.extension.sendMessage({}, function (response) {
 	var readyStateCheckInterval = setInterval(function () {
 		if (document.readyState === "complete") {
+
+			pageLoaded = true;
+
 			clearInterval(readyStateCheckInterval);
 
 			// ----------------------------------------------------------
@@ -47,9 +81,8 @@ chrome.extension.sendMessage({}, function (response) {
 			console.log("I'm still here")
 
 
-
 			stats = createStats()
-			document.body.append(stats.domElement);
+			/* document.body.append(stats.domElement); */
 
 			var all = document.querySelectorAll('*');
 			let deletedControls = false;
@@ -57,7 +90,7 @@ chrome.extension.sendMessage({}, function (response) {
 			//	parse inital page content, remove, sort, delete.
 			for (const e of all) {
 				/* console.log(e.classList.toString()); */
-				if (e.classList.toString().includes('media-engine-video')) videos.push(e);
+				if (e.classList.toString().includes('media-engine-video')) receiveVideoElement(e) /* videos.push(e) */ ;
 				if (e.classList.toString().includes('chat')) {
 					/* console.log(e); */
 					if (e.parentElement.classList.toString().includes('content')) {
@@ -197,7 +230,7 @@ function receiveVideoElement(vid) {
 	clone.style.top = stage.offsetHeight / 2 - clone.offsetHeight / 2 - 50 + "px";
 	clone.style.left = stage.offsetWidth / 2 - clone.offsetWidth / 2 - 50 + "px";
 
-	stage.appendChild(clone);
+	/* stage.appendChild(clone); */
 
 	/* console.log(clone) */
 	videos.push(clone);
@@ -235,10 +268,21 @@ function stripOfClassesExcept(e, exception) {
 
 function createInterface() {
 
+	username = document.getElementsByClassName("title-eS5yk3")[0].innerText;
+
 	// Create stage element
 	stage = document.createElement('div');
 	stage.classList.add("stage")
 	chat.appendChild(stage);
+
+	// Create Maximize Button
+	let button = document.createElement('div');
+	button.onclick = toggleInterface;
+	button.classList.add('fullscreenButton');
+	stage.parentElement.appendChild(button);
+
+	//	Create client avatar
+	avatar = new Avatar(0, 0);
 
 	// Add Event Listeners to Stage
 	stage.addEventListener('click', function () {
@@ -323,11 +367,7 @@ function createInterface() {
 			groundMat.uniforms.mousePos.value.y = mouse.y;
 		}
 
-		// Create Maximize Button
-		let button = document.createElement('div');
-		button.onclick = toggleInterface;
-		button.classList.add('fullscreenButton');
-		stage.parentElement.appendChild(button);
+
 
 	}
 }
@@ -423,37 +463,38 @@ function render() {
 		camera.position.lerp(camTarget, .1);
 		/* console.log(camera.position); */
 	}
-	if (normalized_mouse.x) {
-		raycaster.setFromCamera(normalized_mouse, camera);
-		const intersects = raycaster.intersectObjects([ground]);
+	raycaster.setFromCamera(normalized_mouse, camera);
+	const intersects = raycaster.intersectObjects([ground]);
+	if (intersects[0]) {
 		mouse.x = intersects[0].point.x;
 		mouse.y = intersects[0].point.y;
 		debugCube.position.x = mouse.x
 		debugCube.position.y = mouse.y
 		debugCube.position.z = intersects[0].point.z;
-
-		if (frameCount % 100 == 0) {
-			/* console.log(mouse.x, mouse.y);
-			console.log(mouse.x % (SETTINGS.grid_x / 100)) */
-		}
-		let margin = .02;
-		let coordX = Math.abs(mouse.x) % (SETTINGS.grid_x / 100)
-		let coordY = Math.abs(mouse.y) % (SETTINGS.grid_y / 100)
-		if ((coordX < margin || coordX > SETTINGS.grid_x / 100 - margin)) {
-			document.body.style.cursor = "pointer"
-			canCreateWalls = true;
-			wallType = 0;
-
-		} else if (coordY < margin || coordY > SETTINGS.grid_y / 100 - margin) {
-			document.body.style.cursor = "pointer"
-			canCreateWalls = true;
-			wallType = 1;
-
-		} else {
-			document.body.style.cursor = "default"
-			canCreateWalls = false;
-		}
 	}
+
+	if (frameCount % 100 == 0) {
+		/* console.log(mouse.x, mouse.y);
+		console.log(mouse.x % (SETTINGS.grid_x / 100)) */
+	}
+	let margin = .02;
+	let coordX = Math.abs(mouse.x) % (SETTINGS.grid_x / 100)
+	let coordY = Math.abs(mouse.y) % (SETTINGS.grid_y / 100)
+	if ((coordX < margin || coordX > SETTINGS.grid_x / 100 - margin)) {
+		/* document.body.style.cursor = "pointer" */
+		canCreateWalls = true;
+		wallType = 0;
+
+	} else if (coordY < margin || coordY > SETTINGS.grid_y / 100 - margin) {
+		/* document.body.style.cursor = "pointer" */
+		canCreateWalls = true;
+		wallType = 1;
+
+	} else {
+		/* document.body.style.cursor = "default" */
+		canCreateWalls = false;
+	}
+
 
 
 	prevDims.x = window.innerWidth;

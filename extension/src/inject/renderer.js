@@ -14,6 +14,8 @@ let scene, camera, renderer;
 let ground, groundShadingMat, groundShadingPlane;
 let ambientLight, light, hemi, rectLight, sun;
 
+const loader = new THREE.GLTFLoader();
+
 const normalized_mouse = new THREE.Vector2();
 
 const vertexShader = `
@@ -90,6 +92,7 @@ const onstage = () => {
     camera = new THREE.PerspectiveCamera(75, stage.offsetWidth / stage.offsetHeight, 0.1, 1000);
 
     renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled = true
     renderer.setSize(stage.offsetWidth, stage.offsetHeight);
     stage.appendChild(renderer.domElement);
     renderer.domElement.classList.add("renderer")
@@ -101,23 +104,40 @@ const onstage = () => {
     ground = new THREE.Mesh(new THREE.PlaneGeometry(SETTINGS.grid_x, SETTINGS.grid_y, 1, 1), groundMat);
     groundShadingPlane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20, 1, 1), groundShadingMat)
     groundShadingPlane.position.z = -.01;
+    groundShadingPlane.receiveShadow = true;
     scene.add(groundShadingPlane);
 
     ambientLight = new THREE.AmbientLight(0x404040);
+    /* ambientLight.castShadow = true; */
     /* hemi = new THREE.HemisphereLight(0xffffbb, 0x080820, 1) */
     scene.add(ambientLight);
     /* scene.add(hemi); */
     rectLight = new THREE.RectAreaLight(0xffffff, 5, 5, 5);
     rectLight.position.z = 5;
+    /* rectLight.castShadow = true; */
     scene.add(rectLight);
     sun = new THREE.DirectionalLight(0xffffff, .5);
+    sun.castShadow = true;
     scene.add(sun)
 
     camera.position.z = 1
     camera.lookAt(ground.position)
-    scene.add(ground);
+    /* scene.add(ground); */
 
-    scene.add(debugCube);
+    /* scene.add(debugCube); */
+
+    loader.load('./assets/wall_test.glb', gltf => {
+        scene.add(gltf.scene);
+    })
+
+
+}
+
+function resetShadows() {
+
+    for (child of scene.children) {
+        console.log(child);
+    }
 }
 
 const raycaster = new THREE.Raycaster();
