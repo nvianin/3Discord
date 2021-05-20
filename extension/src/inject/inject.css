@@ -4,20 +4,21 @@
 
 .custom_video {
   background-color: #fff;
+  background-size: contain;
 
   position: absolute;
   z-index: 1000;
-  top: 200px;
-  left: 200px;
+  top: 50%;
+  left: 50%;
   width: 80px;
   height: 80px;
   opacity: 100%;
   border-radius: 5000px;
-  border-width: 2px;
-  border-color: #ddd;
+  border-width: 4px;
+  border-color: #334;
   border-style: solid;
   object-fit: cover;
-  transform: translate(-50%, 50%);
+  transform: translate(-50%, -50%);
 }
 
 .stage {

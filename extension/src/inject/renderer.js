@@ -16,7 +16,7 @@ let ambientLight, light, hemi, rectLight, sun;
 
 const loader = new THREE.GLTFLoader();
 
-const normalized_mouse = new THREE.Vector2();
+let normalized_mouse = new THREE.Vector2();
 
 const vertexShader = `
     varying vec3 vUv; 
@@ -87,13 +87,17 @@ let debugCube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBas
 }));
 debugCube.scale.set(.01, .01, .01)
 
+let shadowRes = 2048;
+
 const onstage = () => {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, stage.offsetWidth / stage.offsetHeight, 0.1, 1000);
 
     renderer = new THREE.WebGLRenderer();
     renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.setSize(stage.offsetWidth, stage.offsetHeight);
+    renderer.logarithmicDepthBuffer = false;
     stage.appendChild(renderer.domElement);
     renderer.domElement.classList.add("renderer")
 
@@ -107,17 +111,23 @@ const onstage = () => {
     groundShadingPlane.receiveShadow = true;
     scene.add(groundShadingPlane);
 
-    ambientLight = new THREE.AmbientLight(0x404040);
-    /* ambientLight.castShadow = true; */
-    /* hemi = new THREE.HemisphereLight(0xffffbb, 0x080820, 1) */
+    ambientLight = new THREE.AmbientLight(0xedf6ff, .6);
+    ambientLight.castShadow = false;
+    hemi = new THREE.HemisphereLight(0xffffbb, 0x080820, .3)
+    hemi.castShadow = false;
     scene.add(ambientLight);
-    /* scene.add(hemi); */
-    rectLight = new THREE.RectAreaLight(0xffffff, 5, 5, 5);
-    rectLight.position.z = 5;
+    scene.add(hemi);
+    /* rectLight = new THREE.RectAreaLight(0xffffff, 5, 5, 5);
+    rectLight.position.z = 5; */
     /* rectLight.castShadow = true; */
-    scene.add(rectLight);
-    sun = new THREE.DirectionalLight(0xffffff, .5);
+    /* scene.add(rectLight); */
+    sun = new THREE.DirectionalLight(0xffffff, 1.);
+    sun.position.set(2, 10, 1);
+    sun.intensity = 1;
+    sun.target = ground;
     sun.castShadow = true;
+    sun.shadow.mapSize.width = shadowRes;
+    sun.shadow.mapSize.height = shadowRes;
     scene.add(sun)
 
     camera.position.z = 1
@@ -125,18 +135,34 @@ const onstage = () => {
     /* scene.add(ground); */
 
     /* scene.add(debugCube); */
+    let url = chrome.runtime.getURL("src/inject/assets/Coop_Space_3.glb");
+    console.log(url)
 
-    loader.load('./assets/wall_test.glb', gltf => {
+    loader.load(url, gltf => {
+        for (var i = 0; i < 5; i++) {
+            console.log("FUCKKKKK " + i)
+        }
+        let sc = .135;
+        gltf.scene.scale.set(sc, sc, sc)
+        gltf.scene.rotation.x = Math.PI / 2;
+        gltf.scene.rotation.y = -Math.PI / 2
         scene.add(gltf.scene);
+
+        activateShadows(scene);
+
+        console.log(gltf)
+    }, error => {
+        console.log(error)
     })
-
-
 }
 
-function resetShadows() {
+function activateShadows(object) {
 
-    for (child of scene.children) {
-        console.log(child);
+    object.castShadow = true;
+    object.receiveShadow = true;
+
+    for (child of object.children) {
+        activateShadows(child);
     }
 }
 

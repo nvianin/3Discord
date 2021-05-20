@@ -11,11 +11,12 @@ class Discord_Observer {
             console.log("***BOT READY")
             this.channel = this.initChannel();
             console.log("***BOT CONNECTED TO: " + this.channel.name + " @ " + this.channel.guild.name);
+
         })
         this.client.login(token);
 
         this.client.on('presenceUpdate', e => {
-            console.log(e)
+            /* console.log(e) */
         })
 
         this.client.on('voiceStateUpdate', (Old, New) => {

@@ -9,20 +9,14 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "permissions": ["fileSystem"],
   "background": {
     "scripts": [
       "src/bg/background.js"
     ],
     "persistent": true
   },
-  "web_accessible_resource":[
-    {
-      "resources":["wall_test.glb, Coop_Space_3.glb"],
-      "matches":["./src/inject/assets/*"]
-    }
-  ],
-  "content_scripts": [
-    {
+  "content_scripts": [{
       "matches": [
         "https://discord.com/*"
       ],
@@ -38,13 +32,14 @@
         "stats.min.js",
         "tweenjs.js",
         "socket.io.js",
-        "three.js",
-        "src/inject/GLTFLoader.js",
+        "src/inject/threejs/three.js",
+        "src/inject/threejs/GLTFLoader.js",
         "src/inject/avatar.js",
         "src/inject/inject.js",
         "src/inject/renderer.js",
         "src/inject/wall.js"
       ]
     }
-  ]
+  ],
+  "web_accessible_resources": ["src/*"]
 }

@@ -21,37 +21,61 @@ const {
 io.on('connect', socket => {
     /* console.log("HANDLING NEW CONNECTION") */
 
-    socket.on('***disconnect', e => {
-        console.log("<<-" + socket.c.name + " @ " + socket.handshake.address);
+    /* for() */
+    for (key of Object.keys(clients)) {
+        const c = clients[key];
+        socket.emit('client_joined', {
+            id: c.id,
+            position: c.position,
+            name: c.name
+        })
+    }
+
+    socket.on('disconnect', e => {
+        try {
+            io.sockets.emit('client_left', {
+                id: socket.c.id
+            });
+            console.log("<<-" + socket.c.name + " @ " + socket.handshake.address);
+            delete clients[socket.c.id];
+        } catch (e) {
+            console.log(e)
+        }
     })
 
     socket.on('id_attribution', e => {
-        /* console.log("***ID ATTRIBUTION FROM " + e.name) */
+        console.log("***ID ATTRIBUTION FROM " + e.name)
         socket.c = new Client(e.name, socket, clients);
         io.sockets.emit('client_joined', {
-            id: socket.c.id
+            id: socket.c.id,
+            position: socket.c.position,
+            name: socket.c.name
         });
         console.log("+>> " + socket.c.name + " @ " + socket.handshake.address);
     })
 
     socket.on('movement_registration', e => {
-        clients[e.id]
+        /* console.log("***" + socket.c.name + " moved " + e.position.x + ":" + e.position.y); */
+        clients[socket.c.id].position = e.position;
+        clients[socket.c.id].acceleration = e.acceleration;
+
+        io.sockets.emit('movement_registration', {
+            position: e.position,
+            acceleration: e.acceleration,
+            id: socket.c.id
+        });
     })
 
 })
 
-function tick() {
+/* function tick() {
 
     for (key of Object.keys(clients)) {
         const client = clients[key];
         if (client.kill) {
-            io.sockets.emit('client_left', {
-                id: client.id
-            });
             delete client;
         }
     }
-
 }
 
-setInterval(tick, 36);
+setInterval(tick, 36); */

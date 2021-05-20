@@ -5,7 +5,9 @@ let mediastreams = [];
 let username = "null_client"
 
 let avatars = []
-let avatar;
+var avatar;
+
+let clients = {};
 
 let pageLoaded = false;
 let AttributionCallback = null;
@@ -26,6 +28,37 @@ socket.on('connect', e => {
 
 	console.log("Emitted message")
 
+})
+
+socket.on('client_joined', e => {
+	console.log(e.name);
+	if (e.name != username) {
+		clients[e.id] = new Avatar(e.position.x, e.position.y, e.name);
+	}
+})
+socket.on('client_left', e => {
+	console.log(e.id + " left")
+	avatars.splice(avatars.findIndex(a => (e == a)), 1);
+	try {
+		clients[e.id].killed = true;
+		clients[e.id] = null;
+	} catch (e) {
+		console.log(e)
+	}
+})
+
+socket.on('movement_registration', e => {
+	try {
+		if (clients[e.id]) {
+			/* console.log(e); */
+			clients[e.id].position.x = e.position.x;
+			clients[e.id].position.y = e.position.y;
+			clients[e.id].acceleration.x = e.acceleration.x;
+			clients[e.id].acceleration.y = e.acceleration.y;
+		}
+	} catch (e) {
+		console.log(e);
+	}
 })
 
 function sendAttribution() {
@@ -114,7 +147,7 @@ chrome.extension.sendMessage({}, function (response) {
 				fetchVideos();
 				/* console.log(videos)
 				console.log(stage) */
-			}, 500)
+			}, 0)
 
 			const MutationCallBack = (mutationsList, observer) => {
 				/* console.log("OBSERVING MUTATION") */
@@ -226,11 +259,13 @@ function receiveVideoElement(vid) {
 	stripOfClassesExcept(clone, "media-engine-video")
 
 	clone.srcObject = vid.srcObject
-	clone.classList.add('custom_video')
-	clone.style.top = stage.offsetHeight / 2 - clone.offsetHeight / 2 - 50 + "px";
-	clone.style.left = stage.offsetWidth / 2 - clone.offsetWidth / 2 - 50 + "px";
+	/* clone.classList.add('custom_video') */
+	/* clone.style.top = stage.offsetHeight / 2 - clone.offsetHeight / 2 - 50 + "px";
+	clone.style.left = stage.offsetWidth / 2 - clone.offsetWidth / 2 - 50 + "px"; */
 
 	/* stage.appendChild(clone); */
+
+	avatar.appendChild(clone);
 
 	/* console.log(clone) */
 	videos.push(clone);
@@ -245,6 +280,8 @@ function receiveVideoElement(vid) {
 
 	console.log("appended video element to stage")
 }
+
+let mouseIsOnScreen = false;
 
 function receiveChatElement(e) {
 
@@ -266,6 +303,8 @@ function stripOfClassesExcept(e, exception) {
 	}
 }
 
+let screen_mouse = new THREE.Vector2;
+
 function createInterface() {
 
 	username = document.getElementsByClassName("title-eS5yk3")[0].innerText;
@@ -280,9 +319,6 @@ function createInterface() {
 	button.onclick = toggleInterface;
 	button.classList.add('fullscreenButton');
 	stage.parentElement.appendChild(button);
-
-	//	Create client avatar
-	avatar = new Avatar(0, 0);
 
 	// Add Event Listeners to Stage
 	stage.addEventListener('click', function () {
@@ -308,7 +344,7 @@ function createInterface() {
 		console.log(camera.position)
 		console.log(mouse.x, mouse.y) */
 
-		if (canCreateWalls) {
+		if (canCreateWalls && false) {
 			let w = new Wall(mouse.x, mouse.y, wallType);
 		} else {
 			camTarget.x = mouse.x;
@@ -323,8 +359,13 @@ function createInterface() {
 		cube.position = new THREE.Vector3(mouse.x, mouse.y, 0);
 		scene.add(cube) */
 
+		//	Create client avatar
+
 
 	})
+
+	avatar = new Avatar(0, 0, username, true);
+
 
 	stage.onmousemove = e => {
 		let stageRect = stage.getBoundingClientRect();
@@ -335,6 +376,14 @@ function createInterface() {
 		normalized_mouse.y = ((e.clientY - stageRect.y) / stageRect.height) * 2 - 1;
 		normalized_mouse.y *= -1;
 
+
+		screen_mouse.x = e.clientX - stageRect.x - stageRect.width / 2;
+		screen_mouse.y = e.clientY - stageRect.y - stageRect.height / 2;
+
+		/* console.log(screen_mouse.x - stageRect.width / 2); */
+
+
+
 		/* normalized_mouse.x = ((e.clientX) / window.innerWidth) * 2 - 1;
 		normalized_mouse.y = ((e.clientY) / window.innerHeight) * 2 - 1; */
 
@@ -342,7 +391,6 @@ function createInterface() {
 		/* console.log(intersects) */
 
 		/* mouse.x += .5; */
-
 
 
 		/* raycaster.setFromCamera(normalized_mouse, camera);
@@ -370,6 +418,18 @@ function createInterface() {
 
 
 	}
+
+	stage.onmouseenter = () => {
+		console.log("moues in");
+
+		mouseIsOnScreen = true;
+
+	}
+	stage.onmouseleave = () => {
+		console.log("moues out");
+		mouseIsOnScreen = false;
+	}
+
 }
 
 function toggleInterface() {
@@ -432,22 +492,19 @@ const resize = () => {
 
 	}
 }
-let mouse = {
-	x: 0,
-	y: 0
-}
+let mouse = new THREE.Vector3();
 
 let camTarget = new THREE.Vector3(0, 0, 1);
-render();
 
+let dt = 0;
+let then, now;
+then = now = Date.now();
 
 function render() {
+	now = Date.now();
+	dt = (now - then) / 10;
 	frameCount++;
-	/* for (i in videos) {
-		videos[i].style.top = Math.sin(frameCount * .01 + i * 40) * videos[i].parentElement.offsetHeight / 2 + videos[i].parentElement.offsetHeight / 2 + "px"
-		videos[i].style.left = Math.cos(frameCount * .01 + i * 40) * videos[i].parentElement.offsetWidth / 2 + videos[i].parentElement.offsetWidth / 2 + "px"
-	} */
-	requestAnimationFrame(render);
+
 
 	if (prevDims.x != window.innerWidth || prevDims.y != window.innerHeight) resize()
 
@@ -455,27 +512,45 @@ function render() {
 		if (renderer) {
 			renderer.render(scene, camera);
 		}
-	} catch {
-		return -1;
-	}
+	} catch {}
 
-	if (camTarget != undefined && camera != undefined) {
+	/* if (camTarget != undefined && camera != undefined) {
 		camera.position.lerp(camTarget, .1);
-		/* console.log(camera.position); */
-	}
-	raycaster.setFromCamera(normalized_mouse, camera);
-	const intersects = raycaster.intersectObjects([ground]);
-	if (intersects[0]) {
-		mouse.x = intersects[0].point.x;
-		mouse.y = intersects[0].point.y;
-		debugCube.position.x = mouse.x
-		debugCube.position.y = mouse.y
-		debugCube.position.z = intersects[0].point.z;
+	} */
+	try {
+		if (camera) {
+			raycaster.setFromCamera(normalized_mouse, camera);
+			const intersects = raycaster.intersectObjects([ground]);
+			if (intersects[0]) {
+				mouse.x = intersects[0].point.x;
+				mouse.y = intersects[0].point.y;
+				debugCube.position.x = mouse.x
+				debugCube.position.y = mouse.y
+				debugCube.position.z = intersects[0].point.z;
+			}
+
+			let min_dist = 100;
+			let max_dist = 300;
+
+			if (screen_mouse.length() > min_dist && mouseIsOnScreen) {
+				let force = Math.max(Math.min((screen_mouse.length() - min_dist) / max_dist, 1), 0);
+				force = mouse.clone().sub(avatar.object.position).multiplyScalar(force * dt * .001);
+
+				avatar.addForce(new THREE.Vector3(force.x, force.y, 0));
+				socket.emit('movement_registration', {
+					position: avatar.object.position,
+					acceleration: avatar.acceleration
+				})
+			}
+		}
+	} catch (e) {
+		console.log(e);
 	}
 
 	if (frameCount % 100 == 0) {
 		/* console.log(mouse.x, mouse.y);
 		console.log(mouse.x % (SETTINGS.grid_x / 100)) */
+		/* console.log(camera.getWorldPosition()); */
 	}
 	let margin = .02;
 	let coordX = Math.abs(mouse.x) % (SETTINGS.grid_x / 100)
@@ -495,8 +570,39 @@ function render() {
 		canCreateWalls = false;
 	}
 
+	for (a of avatars) {
+		/* console.log(a) */
+		a.update();
+
+		if (a.killed) {
+			a.kill();
+			avatars.splice(avatars.findIndex(e => {
+				e == a
+			}), 1);
+
+			delete a;
+		}
+	}
+
 
 
 	prevDims.x = window.innerWidth;
 	prevDims.y = window.innerHeight;
+
+
+	then = now;
+	requestAnimationFrame(render);
 }
+
+render()
+
+function fetchUsers() {
+	var pictures = document.getElementsByClassName("avatarWrapper-29j3CC");
+	let userPics = {}
+	for (pic of pictures) {
+		userPics[pic.ariaLabel] = pic.getElementsByTagName('img')[0].src;
+	}
+	return userPics;
+}
+
+console.log(fetchUsers);

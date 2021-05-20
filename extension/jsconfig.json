@@ -3,7 +3,8 @@
         "include": [
             "three",
             "socket.io",
-            "node_modules"
+            "node_modules",
+            "src/*"
         ]
     },
     "compilerOptions": {
