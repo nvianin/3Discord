@@ -19,9 +19,7 @@ const {
 /* const discord_observer = new Discord_Observer */
 
 io.on('connect', socket => {
-    /* console.log("HANDLING NEW CONNECTION") */
-
-    /* for() */
+    let id;
     for (key of Object.keys(clients)) {
         const c = clients[key];
         socket.emit('client_joined', {
@@ -51,6 +49,7 @@ io.on('connect', socket => {
             position: socket.c.position,
             name: socket.c.name
         });
+        id = socket.c.id;
         console.log("+>> " + socket.c.name + " @ " + socket.handshake.address);
     })
 

@@ -104,13 +104,16 @@ class Avatar {
 
         try {
             if (camera) {
-                let screenspace_position = this.object.position.clone().project(camera);
-                screenspace_position.x = (screenspace_position.x + 1) * (stage.offsetWidth / 2);
-                screenspace_position.y = (screenspace_position.y - 1) * (stage.offsetHeight / 2);
-                /* if (frameCount % 10 == 0) console.log(screenspace_position) */
+                let screenspace_position = this.object.position.clone();
+                screenspace_position.project(camera);
 
-                this.dom.style.top = screenspace_position.x + "px";
-                this.dom.style.bottom = screenspace_position.y + "px";
+                screenspace_position.x = (screenspace_position.x * stage.offsetWidth / 2) + stage.offsetWidth / 2;
+                screenspace_position.y = -(screenspace_position.y * stage.offsetHeight / 2) + stage.offsetHeight / 2;
+
+                this.dom.style.left = screenspace_position.x + "px";
+                this.dom.style.top = screenspace_position.y + "px";
+
+                /* if (frameCount % 10 == 0) console.log(screenspace_position); */
             }
 
         } catch (e) {

@@ -12,7 +12,7 @@ let clients = {};
 let pageLoaded = false;
 let AttributionCallback = null;
 
-const socket = io('http://localhost:3000', {
+const socket = io('http://3discord.ddns.net:3000', {
 	cors: {
 		origin: "https://discord.com",
 		extraHeaders: ["a-custom-header"],
@@ -147,7 +147,7 @@ chrome.extension.sendMessage({}, function (response) {
 				fetchVideos();
 				/* console.log(videos)
 				console.log(stage) */
-			}, 0)
+			}, 500)
 
 			const MutationCallBack = (mutationsList, observer) => {
 				/* console.log("OBSERVING MUTATION") */
@@ -265,7 +265,12 @@ function receiveVideoElement(vid) {
 
 	/* stage.appendChild(clone); */
 
-	avatar.appendChild(clone);
+	if (avatar.video == null) {
+		clone.classList.add("contained_video")
+		avatar.dom.classList.add("contains_video")
+		avatar.dom.appendChild(clone);
+		avatar.video = clone;
+	}
 
 	/* console.log(clone) */
 	videos.push(clone);
@@ -365,10 +370,10 @@ function createInterface() {
 	})
 
 	avatar = new Avatar(0, 0, username, true);
-
+	let stageRect;
 
 	stage.onmousemove = e => {
-		let stageRect = stage.getBoundingClientRect();
+		stageRect = stage.getBoundingClientRect();
 		/* console.log(e.clientX - stageRect.x, e.clientY - stageRect.y) */
 		/* console.log(stageRect.width, stageRect.height) */
 
@@ -484,6 +489,9 @@ let prevDims = {
 
 const resize = () => {
 	/* console.log(stage.offsetWidth, stage.offsetHeight) */
+	if (stage) {
+		stageRect = stage.getBoundingClientRect();
+	}
 	try {
 		camera.aspect = stage.offsetWidth / stage.offsetHeight;
 		camera.updateProjectionMatrix();
@@ -511,6 +519,7 @@ function render() {
 	try {
 		if (renderer) {
 			renderer.render(scene, camera);
+			/* composer.render(); */
 		}
 	} catch {}
 
@@ -530,11 +539,13 @@ function render() {
 			}
 
 			let min_dist = 100;
-			let max_dist = 300;
+			let max_dist = Math.min(300, (stage.offsetWidth / 4) - 30);
 
 			if (screen_mouse.length() > min_dist && mouseIsOnScreen) {
 				let force = Math.max(Math.min((screen_mouse.length() - min_dist) / max_dist, 1), 0);
+				/* if (frameCount % 10 == 0) console.log(force); */
 				force = mouse.clone().sub(avatar.object.position).multiplyScalar(force * dt * .001);
+
 
 				avatar.addForce(new THREE.Vector3(force.x, force.y, 0));
 				socket.emit('movement_registration', {
@@ -583,8 +594,6 @@ function render() {
 			delete a;
 		}
 	}
-
-
 
 	prevDims.x = window.innerWidth;
 	prevDims.y = window.innerHeight;

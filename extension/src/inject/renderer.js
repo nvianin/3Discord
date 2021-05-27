@@ -10,7 +10,7 @@ if (stage) {
     }, 200)
 }
 
-let scene, camera, renderer;
+let scene, camera, renderer, composer;
 let ground, groundShadingMat, groundShadingPlane;
 let ambientLight, light, hemi, rectLight, sun;
 
@@ -93,6 +93,7 @@ const onstage = () => {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, stage.offsetWidth / stage.offsetHeight, 0.1, 1000);
 
+
     renderer = new THREE.WebGLRenderer();
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -100,6 +101,14 @@ const onstage = () => {
     renderer.logarithmicDepthBuffer = false;
     stage.appendChild(renderer.domElement);
     renderer.domElement.classList.add("renderer")
+
+    /* 
+        composer = new THREE.EffectComposer(renderer);
+
+        const renderPass = new THREE.RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        const SAO = new THREE.SAOPass();
+        composer.addPass(SAO); */
 
     console.log("###########################")
     console.log("3D BACKGROUND INITIALIZED")

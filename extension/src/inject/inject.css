@@ -21,6 +21,22 @@
   transform: translate(-50%, -50%);
 }
 
+.contains_video {
+}
+
+.contained_video {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  overflow: hidden;
+  width: 80px;
+  height: 80px;
+  border-radius: 10000px;
+
+  z-index: 999;
+}
+
 .stage {
   position: absolute;
   width: 100%;
