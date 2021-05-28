@@ -426,13 +426,13 @@ function createInterface() {
 	}
 
 	stage.onmouseenter = () => {
-		console.log("moues in");
+		console.log("mouse in");
 
 		mouseIsOnScreen = true;
 
 	}
 	stage.onmouseleave = () => {
-		console.log("moues out");
+		console.log("mouse out");
 		mouseIsOnScreen = false;
 	}
 
