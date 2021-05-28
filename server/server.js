@@ -32,7 +32,7 @@ io.on('connect', socket => {
     socket.on('disconnect', e => {
         try {
             io.sockets.emit('client_left', {
-                id: socket.c.id
+                id: id
             });
             console.log("<<-" + socket.c.name + " @ " + socket.handshake.address);
             delete clients[socket.c.id];

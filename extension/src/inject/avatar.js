@@ -34,7 +34,7 @@ class Avatar {
                     this.dom.style.backgroundImage = `url(${this.profile_picture})`;
                     clearInterval(this.profilePicGetter);
                 }
-            }, 200);
+            }, 1000);
         }
 
 

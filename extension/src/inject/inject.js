@@ -12,7 +12,7 @@ let clients = {};
 let pageLoaded = false;
 let AttributionCallback = null;
 
-const socket = io('http://3discord.ddns.net:3000', {
+const socket = io('https://3discord.ddns.net:3000', {
 	cors: {
 		origin: "https://discord.com",
 		extraHeaders: ["a-custom-header"],
@@ -38,7 +38,8 @@ socket.on('client_joined', e => {
 })
 socket.on('client_left', e => {
 	console.log(e.id + " left")
-	avatars.splice(avatars.findIndex(a => (e == a)), 1);
+	let i = avatars.findIndex(a => (e == a));
+	avatars.splice(i, 1);
 	try {
 		clients[e.id].killed = true;
 		clients[e.id] = null;

@@ -21,8 +21,8 @@ class Discord_Observer {
 
         this.client.on('voiceStateUpdate', (Old, New) => {
             /* console.log(Old, New); */
-            fs.writeFileSync('voiceStateDebug_old.json', JSON.stringify(Old))
-            fs.writeFileSync('voiceStateDebug_new.json', JSON.stringify(New))
+            /* fs.writeFileSync('voiceStateDebug_old.json', JSON.stringify(Old))
+            fs.writeFileSync('voiceStateDebug_new.json', JSON.stringify(New)) */
         })
 
         /* this.servers = this.client.guilds.cache.array(); */
