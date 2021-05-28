@@ -38,11 +38,16 @@ socket.on('client_joined', e => {
 })
 socket.on('client_left', e => {
 	console.log(e.id + " left")
-	let i = avatars.findIndex(a => (e == a));
+	let i = avatars.findIndex(a => (e.id == a.id));
 	avatars.splice(i, 1);
 	try {
+		console.log(clients[e.id].name + " deleted from clients");
 		clients[e.id].killed = true;
 		clients[e.id] = null;
+		let i = clients.findIndex(c => {
+			c.id == e.id
+		});
+		clients.splice(i, 1)
 	} catch (e) {
 		console.log(e)
 	}
@@ -553,6 +558,7 @@ function render() {
 					position: avatar.object.position,
 					acceleration: avatar.acceleration
 				})
+				/* console.log(avatar.object.position, avatar.acceleration); */
 			}
 		}
 	} catch (e) {
@@ -584,7 +590,7 @@ function render() {
 
 	for (a of avatars) {
 		/* console.log(a) */
-		a.update();
+
 
 		if (a.killed) {
 			a.kill();
@@ -593,6 +599,8 @@ function render() {
 			}), 1);
 
 			delete a;
+		} else {
+			a.update();
 		}
 	}
 

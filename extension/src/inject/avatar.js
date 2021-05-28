@@ -88,7 +88,7 @@ class Avatar {
     update() {
         this.position.add(this.acceleration);
         this.acceleration.multiplyScalar(.9);
-        /*         console.log(this.object.position) */
+        if (frameCount % 100 == 0) console.log(this.name)
 
 
         if (this.client) {
@@ -122,10 +122,11 @@ class Avatar {
     }
 
     kill() {
+        console.log(this.name + " was killed")
         this.object.geometry.dispose();
         this.object.material.dispose();
         scene.remove(this.object)
-        this.dom.parentNode.removeChild(this.dom);
+        stage.removeChild(this.dom);
 
         this.killed = true;
     }

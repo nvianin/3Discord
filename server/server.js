@@ -1,10 +1,19 @@
 let {
     Client
 } = require('./thingies/client_object')
+let fs = require('fs');
+let https = require('https');
+const server = https.createServer({
+    key: fs.readFileSync('../https/privkey.pem'),
+    cert: fs.readFileSync('../https/fullchain.pem')
+}, (req, res) => {
+    res.writeHead(200);
+    res.end('hello world\n');
+}).listen(3000);
 
 let clients = {};
 
-const io = require('socket.io')(3000, {
+const io = require('socket.io')(server, {
     cors: {
         origin: "https://discord.com",
         methods: ["GET", "POST"],
@@ -34,6 +43,7 @@ io.on('connect', socket => {
             io.sockets.emit('client_left', {
                 id: id
             });
+            1
             console.log("<<-" + socket.c.name + " @ " + socket.handshake.address);
             delete clients[socket.c.id];
         } catch (e) {
@@ -54,7 +64,7 @@ io.on('connect', socket => {
     })
 
     socket.on('movement_registration', e => {
-        /* console.log("***" + socket.c.name + " moved " + e.position.x + ":" + e.position.y); */
+        console.log("***" + socket.c.name + " moved " + e.acceleration.x + ":" + e.acceleration.y);
         clients[socket.c.id].position = e.position;
         clients[socket.c.id].acceleration = e.acceleration;
 

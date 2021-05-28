@@ -19,6 +19,8 @@
   border-style: solid;
   object-fit: cover;
   transform: translate(-50%, -50%);
+
+  user-select: none;
 }
 
 .contains_video {
@@ -33,6 +35,7 @@
   width: 80px;
   height: 80px;
   border-radius: 10000px;
+  object-fit: cover;
 
   z-index: 999;
 }
