@@ -54,6 +54,7 @@ io.on('connect', socket => {
     socket.on('id_attribution', e => {
         console.log("***ID ATTRIBUTION FROM " + e.name)
         socket.c = new Client(e.name, socket, clients);
+        socket.emit('id_attribution', socket.c.id);
         io.sockets.emit('client_joined', {
             id: socket.c.id,
             position: socket.c.position,
@@ -64,7 +65,7 @@ io.on('connect', socket => {
     })
 
     socket.on('movement_registration', e => {
-        console.log("***" + socket.c.name + " moved " + e.acceleration.x + ":" + e.acceleration.y);
+        /* console.log("***" + socket.c.name + " moved " + e.acceleration.x + ":" + e.acceleration.y); */
         clients[socket.c.id].position = e.position;
         clients[socket.c.id].acceleration = e.acceleration;
 

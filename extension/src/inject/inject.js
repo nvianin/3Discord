@@ -34,20 +34,27 @@ socket.on('client_joined', e => {
 	console.log(e.name);
 	if (e.name != username) {
 		clients[e.id] = new Avatar(e.position.x, e.position.y, e.name);
+		clients[e.id].id = e.id;
+	} else {
+		console.log("NOT ADDING SELF TO CLIENT LEDGER")
 	}
 })
+socket.on('id_attribution', id => {
+	avatar.id = id;
+})
 socket.on('client_left', e => {
-	console.log(e.id + " left")
-	let i = avatars.findIndex(a => (e.id == a.id));
-	avatars.splice(i, 1);
+	console.log(e.id + " LEFT")
+	/* let i = avatars.findIndex(a => (e.id == a.id));
+	avatars.splice(i, 1); */
 	try {
 		console.log(clients[e.id].name + " deleted from clients");
 		clients[e.id].killed = true;
-		clients[e.id] = null;
-		let i = clients.findIndex(c => {
-			c.id == e.id
-		});
-		clients.splice(i, 1)
+		console.log(clients[e.id].killed);
+		/* let temp = clients[e.id]; */
+		delete clients[e.id];
+		/* console.log(temp + "WAS NOT BLOODY KILLED") */
+
+		/* clients.splice(i, 1) */
 	} catch (e) {
 		console.log(e)
 	}
@@ -589,10 +596,12 @@ function render() {
 	}
 
 	for (a of avatars) {
-		/* console.log(a) */
+		/* if (frameCount % 50 == 0) console.log(a) */
 
 
 		if (a.killed) {
+			console.log("fuck");
+			console.log("killing " + a.name)
 			a.kill();
 			avatars.splice(avatars.findIndex(e => {
 				e == a

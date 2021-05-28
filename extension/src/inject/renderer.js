@@ -147,6 +147,10 @@ const onstage = () => {
     let url = chrome.runtime.getURL("src/inject/assets/Coop_Space_3.glb");
     console.log(url)
 
+    const texLoader = new THREE.TextureLoader();
+    const ground_tex = texLoader.load('./assets/ground_tex.png');
+    const wall_tex = texLoader.load('./assets/wall_tex.png');
+
     loader.load(url, gltf => {
         for (var i = 0; i < 5; i++) {
             console.log("FUCKKKKK " + i)
@@ -156,6 +160,7 @@ const onstage = () => {
         gltf.scene.rotation.x = Math.PI / 2;
         gltf.scene.rotation.y = -Math.PI / 2
         scene.add(gltf.scene);
+        console.log(getMats());
 
         activateShadows(scene);
 
@@ -176,3 +181,14 @@ function activateShadows(object) {
 }
 
 const raycaster = new THREE.Raycaster();
+
+function getMats() {
+    const materials = new Set();
+
+    scene.traverse(function (object) {
+
+        if (object.material) materials.add(object.material);
+
+    });
+    return materials;
+}

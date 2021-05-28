@@ -5,6 +5,8 @@ class Avatar {
         this.name = name;
         this.dom.id = name
         this.client = client;
+        this.id = null;
+        this.killed = false;
 
         this.object = new THREE.Mesh(new THREE.BoxGeometry, new THREE.MeshBasicMaterial({
             color: 0xffff00
@@ -88,7 +90,7 @@ class Avatar {
     update() {
         this.position.add(this.acceleration);
         this.acceleration.multiplyScalar(.9);
-        if (frameCount % 100 == 0) console.log(this.name)
+        /* if (frameCount % 100 == 0) console.log(this.name) */
 
 
         if (this.client) {
@@ -122,11 +124,12 @@ class Avatar {
     }
 
     kill() {
-        console.log(this.name + " was killed")
+        console.log(this.name + " was killed with id " + this.id)
         this.object.geometry.dispose();
         this.object.material.dispose();
         scene.remove(this.object)
-        stage.removeChild(this.dom);
+        console.log(this.dom);
+        /* this.dom.parentNode.removeChild(this.dom) */
 
         this.killed = true;
     }
