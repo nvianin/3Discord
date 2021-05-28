@@ -10,6 +10,28 @@ if (stage) {
     }, 200)
 }
 
+const texLoader = new THREE.TextureLoader();
+let ground_tex
+texLoader.load('.assets/ground_tex.png', texture => {
+    console.log("TEXTURE LOADED");
+    ground_tex = texture;
+    ground_tex.repeat.x = 10000
+    ground_tex.repeat.y = 10000
+    ground_tex.wrapS = THREE.RepeatWrapping;
+    ground_tex.wrapT = THREE.RepeatWrapping;
+    console.log(ground_tex);
+});
+let wall_tex
+texLoader.load('https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/490/1000x0/haha-1586954667-dG2XxpFzms.jpg', texture => {
+    console.log("TEXTURE LOADED");
+    wall_tex = texture;
+    wall_tex.repeat.x = 10000
+    wall_tex.repeat.y = 10000
+    wall_tex.wrapS = THREE.RepeatWrapping;
+    wall_tex.wrapT = THREE.RepeatWrapping;
+    console.log(wall_tex);
+});
+
 let scene, camera, renderer, composer;
 let ground, groundShadingMat, groundShadingPlane;
 let ambientLight, light, hemi, rectLight, sun;
@@ -147,9 +169,7 @@ const onstage = () => {
     let url = chrome.runtime.getURL("src/inject/assets/Coop_Space_3.glb");
     console.log(url)
 
-    const texLoader = new THREE.TextureLoader();
-    const ground_tex = texLoader.load('./assets/ground_tex.png');
-    const wall_tex = texLoader.load('./assets/wall_tex.png');
+
 
     loader.load(url, gltf => {
         for (var i = 0; i < 5; i++) {
@@ -160,7 +180,21 @@ const onstage = () => {
         gltf.scene.rotation.x = Math.PI / 2;
         gltf.scene.rotation.y = -Math.PI / 2
         scene.add(gltf.scene);
-        console.log(getMats());
+
+        let materials = getMats()
+        for (mat of materials) {
+            /* console.log(mat); */
+            switch (mat.name) {
+                case "ground.001":
+                    mat.map = ground_tex;
+                    console.log(mat.map);
+                    break;
+                case "wall.001":
+                    mat.map = wall_tex;
+                    console.log(mat.map);
+                    break;
+            }
+        }
 
         activateShadows(scene);
 
