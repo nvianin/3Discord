@@ -2,7 +2,7 @@ let fuckingloader = new THREE.GLTFLoader();
 
 let portraitObject
 fuckingloader.load(chrome.runtime.getURL('src/inject/assets/portrait.glb'), gltf => {
-    portraitObject = gltf.scene.children[0].geometry;
+    portraitObject = gltf.scene.children[0];
     console.log(gltf.scene)
 })
 
@@ -16,12 +16,13 @@ class Avatar {
         this.id = null;
         this.killed = false;
 
-        this.object = new THREE.Mesh(portraitObject, new THREE.MeshBasicMaterial({
-            color: 0xffff00
-        }))
-        this.object.scale.set(.01, .01, .01);
-        this.object.position.set(x, y, 0);
-        this.object.name = this.name + " impostor"
+        this.object = portraitObject.clone()
+        this.object.rotation.x = Math.PI/2;
+        this.object.scale.set(.1, .1, .1);
+        this.object.children[1].material = new THREE.MeshStandardMaterial({color:0xff00ff});
+
+        /* this.object.position.set(x, y, 0);
+        this.object.name = this.name + " impostor" */
 
         this.profile_picture;
 
