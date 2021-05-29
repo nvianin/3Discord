@@ -31,8 +31,8 @@ socket.on('connect', e => {
 })
 
 socket.on('client_joined', e => {
-	console.log(e.name);
 	if (e.name != username) {
+		console.log(e.name + " joined", username);
 		clients[e.id] = new Avatar(e.position.x, e.position.y, e.name);
 		clients[e.id].id = e.id;
 	} else {
@@ -270,6 +270,16 @@ function receiveVideoElement(vid) {
 	console.log("Original/Clone below:")
 	console.log(vid)
 	/* console.log(clone) */
+
+	let name = vid.parentElement.parentElement.getElementsByClassName('overlayTitleText-2mmQzi')[0].innerText
+	console.log(name);
+
+	let av = avatars.find(a => a.name == name);
+	if (av) {
+		av.video = vid;
+		av.initVideo()
+	}
+	console.log(av)
 
 	stripOfClassesExcept(clone, "media-engine-video")
 
