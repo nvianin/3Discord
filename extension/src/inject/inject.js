@@ -271,6 +271,16 @@ function receiveVideoElement(vid) {
 	console.log(vid)
 	/* console.log(clone) */
 
+	let name = vid.parentElement.parentElement.getElementsByClassName('overlayTitleText-2mmQzi')[0].innerText
+	console.log(name);
+
+	let av = avatars.find(a => a.name == name);
+	if (av) {
+		av.video = vid;
+		av.initVideo()
+	}
+	console.log(av)
+
 	stripOfClassesExcept(clone, "media-engine-video")
 
 	clone.srcObject = vid.srcObject
