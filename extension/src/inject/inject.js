@@ -47,14 +47,16 @@ socket.on('client_left', e => {
 	/* let i = avatars.findIndex(a => (e.id == a.id));
 	avatars.splice(i, 1); */
 	try {
-		console.log(clients[e.id].name + " deleted from clients");
-		clients[e.id].killed = true;
-		console.log(clients[e.id].killed);
-		/* let temp = clients[e.id]; */
-		delete clients[e.id];
-		/* console.log(temp + "WAS NOT BLOODY KILLED") */
+		if (clients[e.id].name != username) {
+			console.log(clients[e.id].name + " deleted from clients");
+			clients[e.id].killed = true;
+			console.log(clients[e.id].killed);
+			/* let temp = clients[e.id]; */
+			delete clients[e.id];
+			/* console.log(temp + "WAS NOT BLOODY KILLED") */
 
-		/* clients.splice(i, 1) */
+			/* clients.splice(i, 1) */
+		}
 	} catch (e) {
 		console.log(e)
 	}
@@ -267,7 +269,7 @@ function receiveVideoElement(vid) {
 	} */
 	console.log("Original/Clone below:")
 	console.log(vid)
-	console.log(clone)
+	/* console.log(clone) */
 
 	stripOfClassesExcept(clone, "media-engine-video")
 
@@ -278,21 +280,21 @@ function receiveVideoElement(vid) {
 
 	/* stage.appendChild(clone); */
 
-	if (avatar.video == null) {
+	/* if (avatar.video == null) {
 		clone.classList.add("contained_video")
 		avatar.dom.classList.add("contains_video")
 		avatar.dom.appendChild(clone);
 		avatar.video = clone;
-	}
+	} */
 
 	/* console.log(clone) */
-	videos.push(clone);
+	/* videos.push(clone); */
 	console.log(videos.length)
 
 	searchParentsLabels(vid);
 
 	knownVideos.push(vid);
-	knownVideos.push(clone);
+	/* knownVideos.push(clone); */
 
 
 
@@ -599,19 +601,26 @@ function render() {
 		/* if (frameCount % 50 == 0) console.log(a) */
 
 
-		if (a.killed) {
+		if (a.killed && a.name != username) {
 			console.log("fuck");
 			console.log("killing " + a.name)
+			for (let e of document.getElementsByClassName("custom_video")) {
+				if (e.id == a.name) {
+					e.parentElement.removeChild(e)
+				}
+			}
 			a.kill();
 			avatars.splice(avatars.findIndex(e => {
 				e == a
 			}), 1);
-
 			delete a;
 		} else {
 			a.update();
 		}
 	}
+	try {
+		avatar.update()
+	} catch {}
 
 	prevDims.x = window.innerWidth;
 	prevDims.y = window.innerHeight;

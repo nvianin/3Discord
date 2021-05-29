@@ -47,7 +47,7 @@ io.on('connect', socket => {
             console.log("<<-" + socket.c.name + " @ " + socket.handshake.address);
             delete clients[socket.c.id];
         } catch (e) {
-            console.log(e)
+            console.log("<<- disconnection but name unavailable")
         }
     })
 
@@ -78,14 +78,20 @@ io.on('connect', socket => {
 
 })
 
-/* function tick() {
+const log = console.log;
 
-    for (key of Object.keys(clients)) {
+function tick() {
+    let keys = Object.keys(clients)
+    for (key of keys) {
         const client = clients[key];
-        if (client.kill) {
-            delete client;
+        for (key of keys) {
+            let clientb = clients[key];
+            if (client != clientb) {
+                let distance = Math.sqrt((Math.pow(client.position.x - clientb.position.x, 2) + Math.pow(client.position.y - clientb.position.y, 2)));
+                log(distance)
+            }
         }
     }
 }
 
-setInterval(tick, 36); */
+setInterval(tick, 100);

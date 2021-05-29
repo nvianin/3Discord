@@ -1,14 +1,22 @@
+let fuckingloader = new THREE.GLTFLoader();
+
+let portraitObject
+fuckingloader.load(chrome.runtime.getURL('src/inject/assets/portrait.glb'), gltf => {
+    portraitObject = gltf.scene.children[0].geometry;
+    console.log(gltf.scene)
+})
+
 class Avatar {
     constructor(x = 0, y = 0, name, client = false) {
-        this.dom = document.createElement("div");
-        this.dom.classList.add("custom_video");
+        /* this.dom = document.createElement("div");
+        this.dom.classList.add("custom_video"); */
         this.name = name;
-        this.dom.id = name
+        /* this.dom.id = name */
         this.client = client;
         this.id = null;
         this.killed = false;
 
-        this.object = new THREE.Mesh(new THREE.BoxGeometry, new THREE.MeshBasicMaterial({
+        this.object = new THREE.Mesh(portraitObject, new THREE.MeshBasicMaterial({
             color: 0xffff00
         }))
         this.object.scale.set(.01, .01, .01);
@@ -17,27 +25,27 @@ class Avatar {
 
         this.profile_picture;
 
-        let profilePics = fetchUsers();
-        console.log(profilePics[this.name]);
-        if (profilePics[this.name]) {
-            this.profile_picture = profilePics[this.name];
-            /* let picture = document.createElement('img');
-            picture.src = this.profile_picture;
-            this.dom.appendChild(picture); */
-            this.dom.style.backgroundImage = `url(${this.profile_picture})`;
-            console.log(this.dom.style.backgroundImage)
-        } else {
-            this.profilePicGetter = setInterval(() => {
-                profilePics = fetchUsers()
-                console.log("failed to get profile pic for " + this.name)
-                console.log(profilePics)
-                if (profilePics[this.name]) {
-                    this.profile_picture = profilePics[this.name];
-                    this.dom.style.backgroundImage = `url(${this.profile_picture})`;
-                    clearInterval(this.profilePicGetter);
-                }
-            }, 1000);
-        }
+        /*  let profilePics = fetchUsers();
+         console.log(profilePics[this.name]);
+         if (profilePics[this.name]) {
+             this.profile_picture = profilePics[this.name];
+             //let picture = document.createElement('img');
+             //picture.src = this.profile_picture;
+             //this.dom.appendChild(picture);
+             this.dom.style.backgroundImage = `url(${this.profile_picture})`;
+             console.log(this.dom.style.backgroundImage)
+         } else {
+             this.profilePicGetter = setInterval(() => {
+                 profilePics = fetchUsers()
+                 console.log("failed to get profile pic for " + this.name)
+                 console.log(profilePics)
+                 if (profilePics[this.name]) {
+                     this.profile_picture = profilePics[this.name];
+                     this.dom.style.backgroundImage = `url(${this.profile_picture})`;
+                     clearInterval(this.profilePicGetter);
+                 }
+             }, 1000);
+         } */
 
 
         if (scene) {
@@ -56,15 +64,15 @@ class Avatar {
         this.acceleration = new THREE.Vector3();
 
         if (stage) {
-            stage.appendChild(this.dom);
+            /* stage.appendChild(this.dom); */
         } else {
             this.stageAppendingInterval = setInterval(() => {
                 if (stage) {
-                    stage.appendChild(this.dom);
+                    /* stage.appendChild(this.dom); */
                     clearInterval(this.stageAppendingInterval);
                 }
                 console.log("trying append avatar")
-            })
+            }, 200)
         }
         /*  if (client) {
              if (camera) {
@@ -105,7 +113,7 @@ class Avatar {
         this.object.position.copy(this.position);
 
         try {
-            if (camera) {
+            if (camera && false) {
                 let screenspace_position = this.object.position.clone();
                 screenspace_position.project(camera);
 

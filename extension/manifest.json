@@ -41,5 +41,9 @@
       ]
     }
   ],
-  "web_accessible_resources": ["src/*"]
+  "web_accessible_resources": [
+    "./src/inject/assets/Coop_Space_3.glb",
+    "src/inject/assets/portrait.glb",
+    "src/inject/assets/*"
+  ]
 }

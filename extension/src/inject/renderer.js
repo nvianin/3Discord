@@ -12,7 +12,7 @@ if (stage) {
 
 const texLoader = new THREE.TextureLoader();
 let ground_tex
-texLoader.load('.assets/ground_tex.png', texture => {
+texLoader.load(chrome.runtime.getURL('src/inject/assets/ground_tex.png'), texture => {
     console.log("TEXTURE LOADED");
     ground_tex = texture;
     ground_tex.repeat.x = 10000
@@ -22,7 +22,7 @@ texLoader.load('.assets/ground_tex.png', texture => {
     console.log(ground_tex);
 });
 let wall_tex
-texLoader.load('https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/490/1000x0/haha-1586954667-dG2XxpFzms.jpg', texture => {
+texLoader.load(chrome.runtime.getURL('src/inject/assets/wall_tex.png'), texture => {
     console.log("TEXTURE LOADED");
     wall_tex = texture;
     wall_tex.repeat.x = 10000
