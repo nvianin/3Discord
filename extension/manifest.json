@@ -33,6 +33,7 @@
         "tweenjs.js",
         "socket.io.js",
         "src/inject/threejs/three.js",
+        "src/inject/notificationManager.js",
         "src/inject/threejs/GLTFLoader.js",
         "src/inject/avatar.js",
         "src/inject/inject.js",

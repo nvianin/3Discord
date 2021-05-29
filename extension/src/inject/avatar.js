@@ -17,9 +17,11 @@ class Avatar {
         this.killed = false;
 
         this.object = portraitObject.clone()
-        this.object.rotation.x = Math.PI/2;
-        this.object.scale.set(.1, .1, .1);
-        this.object.children[1].material = new THREE.MeshStandardMaterial({color:0xff00ff});
+        this.object.rotation.x = Math.PI / 2;
+        this.object.scale.set(.075, .075, .075);
+        this.object.children[1].material = new THREE.MeshStandardMaterial({
+            color: 0xff00ff
+        });
 
         /* this.object.position.set(x, y, 0);
         this.object.name = this.name + " impostor" */

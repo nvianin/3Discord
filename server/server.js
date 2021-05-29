@@ -88,7 +88,7 @@ function tick() {
             let clientb = clients[key];
             if (client != clientb) {
                 let distance = Math.sqrt((Math.pow(client.position.x - clientb.position.x, 2) + Math.pow(client.position.y - clientb.position.y, 2)));
-                log(distance)
+                /* log(distance) */
             }
         }
     }
