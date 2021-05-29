@@ -31,8 +31,8 @@ socket.on('connect', e => {
 })
 
 socket.on('client_joined', e => {
-	console.log(e.name);
 	if (e.name != username) {
+		console.log(e.name + " joined", username);
 		clients[e.id] = new Avatar(e.position.x, e.position.y, e.name);
 		clients[e.id].id = e.id;
 	} else {

@@ -55,12 +55,23 @@ io.on('connect', socket => {
         console.log("***ID ATTRIBUTION FROM " + e.name)
         socket.c = new Client(e.name, socket, clients);
         socket.emit('id_attribution', socket.c.id);
-        io.sockets.emit('client_joined', {
+        /* io.sockets.emit('client_joined', {
             id: socket.c.id,
             position: socket.c.position,
             name: socket.c.name
-        });
+        }); */
         id = socket.c.id;
+
+        for (let s of io.sockets) {
+            if (s.c.id != socket.c.id) {
+                socket.emit('client_joined', {
+                    id: socket.c.id,
+                    position: socket.c.position,
+                    name: socket.c.name
+                })
+            }
+        }
+
         console.log("+>> " + socket.c.name + " @ " + socket.handshake.address);
     })
 

@@ -21,9 +21,8 @@
             this.object.rotation.x = Math.PI / 2;
             this.object.position.z = .1;
             this.object.scale.set(.1, .1, .1);
-            this.video_material = new THREE.MeshStandardMaterial({
-                color: 0xff00ff
-            });
+            this.video_material = new THREE.MeshStandardMaterial();
+            this.video_material.name = this.name + " video"
             this.object.children[1].material = this.video_material;
 
             /* this.object.position.set(x, y, 0);
@@ -138,6 +137,8 @@
 
             if (this.video_texture) {
                 let ctx = this.video_canvas.getContext('2d');
+                ctx.fillStyle = "white"
+                ctx.rect(0,0,10000,10000);
                 ctx.drawImage(this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
                 this.video_texture.needsUpdate = true;
             }
@@ -161,7 +162,7 @@
                 this.video_canvas.width = this.video.videoWidth;
                 this.video_canvas.height = this.video.videoHeight;
                 document.body.appendChild(this.video_canvas)
-                this.video_texture = new THREE.Texture(this.video_canvas);
+                this.video_texture = new THREE.CanvasTexture(this.video_canvas);
                 this.video_texture.minFilter = THREE.LinearFilter;
                 this.video_texture.magFilter = THREE.LinearFilter;
 
