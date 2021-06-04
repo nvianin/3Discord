@@ -13,9 +13,12 @@ class Discord_Observer {
         this.client.on('ready', () => {
             console.log("***BOT READY")
             this.channel = this.initChannel();
+            /* this.sendChat(";;play rickroll") */
             this.guild = this.channel.guild;
-            log(this.guild)
+            /* log(this.guild) */
             console.log("***BOT CONNECTED TO: " + this.channel.name + " @ " + this.channel.guild.name);
+
+            log(this.client.channels.cache.array())
 
             /* Object.keys(this.client.channels.cache) */
             for (let chan of this.client.channels.cache.array()) {
@@ -58,8 +61,13 @@ class Discord_Observer {
             if (channel.name.includes('3Discord')) {
                 return channel;
             }
+            if (channel.type == 'text') {
+                this.textChannel = channel;
+            }
         }
     }
+
+
 
     findUser(username) {
         for (let u of this.guild.members.cache.array()) {
@@ -68,6 +76,10 @@ class Discord_Observer {
                 return u;
             }
         }
+    }
+
+    sendChat(text) {
+        this.textChannel.send(text)
     }
 
     getUsers() {

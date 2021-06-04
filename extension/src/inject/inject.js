@@ -16,7 +16,7 @@ let url = "3discord.ddns.net"
 /* url = "192.168.15.191"
 url = "172.19.46.12" */
 
-const socket = io('https://' + url + ':3000', {
+const socket = io('https://' + url + ':80', {
 	cors: {
 		origin: "https://discord.com",
 		extraHeaders: ["a-custom-header"],
