@@ -19,10 +19,11 @@
 
             this.object = portraitObject.clone()
             this.object.rotation.x = Math.PI / 2;
-            this.object.position.z = .1;
+            this.object.rotation.y = -Math.PI / 2 - .2
+            /* this.position.z = .1; */
             this.object.scale.set(.075, .075, .075);
             this.video_material = new THREE.MeshBasicMaterial();
-            this.video_material.name = this.name + " video"
+            this.video_material.name = this.name + " video";
             this.object.children[1].material = this.video_material;
 
             /* this.object.position.set(x, y, 0);
@@ -65,7 +66,7 @@
                 }, 200)
             }
 
-            this.position = new THREE.Vector3(x, y, 0);
+            this.position = new THREE.Vector3(x, y, 0.03);
             this.acceleration = new THREE.Vector3();
 
             if (stage) {
@@ -147,7 +148,7 @@
         kill() {
             console.log(this.name + " was killed with id " + this.id)
             /* this.object.geometry.dispose(); */
-            this.object.material.dispose();
+            this.object.children[1].material.dispose();
             scene.remove(this.object)
             console.log(this.dom);
             /* this.dom.parentNode.removeChild(this.dom) */
@@ -157,23 +158,34 @@
 
         initVideo() {
             console.log("trying to init video");
-            if (this.video.videoHeight != 0) {
-                this.video_canvas = document.createElement('canvas');
-                this.video_canvas.width = this.video.videoWidth;
-                this.video_canvas.height = this.video.videoHeight;
-                document.body.appendChild(this.video_canvas)
-                this.video_texture = new THREE.CanvasTexture(this.video_canvas);
-                this.video_texture.minFilter = THREE.LinearFilter;
-                this.video_texture.magFilter = THREE.LinearFilter;
+            /* try { */
+            /* this.initVideo() */
+            if (this.video && this.video.videoHeight != 0) {
+                console.log("initting video");
 
-                /* this.video_material.map = this.video_texture; */
-                this.object.material = new THREE.MeshBasicMaterial({
-                    map: this.video_texture
+                this.object.children[1].material = new THREE.MeshBasicMaterial({
+                    map: new THREE.VideoTexture(this.video)
                 });
+                /* this.object.children[1].material = new THREE.MeshBasicMaterial({
+                    color: 0xff0000
+                }) */
+
+                /* this.object.material.color = new THREE.Color(0xff00ff) */
+                /* this.object.material = new THREE.MeshBasicMaterial({
+                    map: this.video_texture
+                }); */
+
+                /*                 scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({
+                                    map: new THREE.VideoTexture(this.video)
+                                }))) */
 
             } else {
-                setTimeout(this.initVideo, 200);
+                console.log("setting init video timeout");
+                setTimeout(this.initVideo, 500);
             }
-
+            /* } catch (e) {
+                setTimeout(this.initVideo, 200);
+                console.log(e);
+            } */
         }
     }

@@ -12,7 +12,11 @@ let clients = {};
 let pageLoaded = false;
 let AttributionCallback = null;
 
-const socket = io('https://3discord.ddns.net:3000', {
+let url = "3discord.ddns.net"
+/* url = "192.168.15.191"
+url = "172.19.46.12" */
+
+const socket = io('https://' + url + ':3000', {
 	cors: {
 		origin: "https://discord.com",
 		extraHeaders: ["a-custom-header"],
@@ -31,6 +35,7 @@ socket.on('connect', e => {
 })
 
 socket.on('client_joined', e => {
+	console.log(e.name)
 	if (e.name != username) {
 		console.log(e.name + " joined", username);
 		clients[e.id] = new Avatar(e.position.x, e.position.y, e.name);
@@ -84,6 +89,7 @@ function sendAttribution() {
 		socket.emit('id_attribution', {
 			name: username
 		});
+		console.log("THIS FUCKING BULLSHIT FUCKING USERNAME FUCK SHIT IS FUCKING " + username);
 	} else {
 		if (AttributionCallback == null) {
 			AttributionCallback = setInterval(sendAttribution, 300);

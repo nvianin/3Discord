@@ -62,9 +62,12 @@ io.on('connect', socket => {
         }); */
         id = socket.c.id;
 
-        for (let s of io.sockets) {
+        for (let key of Object.keys(clients)) {
+            let s = clients[key].socket;
             if (s.c.id != socket.c.id) {
-                socket.emit('client_joined', {
+                console.log(key)
+                console.log("SENDING FUCKING ATTRIBUTION TO FUCKING " + s.c.name);
+                s.emit('client_joined', {
                     id: socket.c.id,
                     position: socket.c.position,
                     name: socket.c.name
