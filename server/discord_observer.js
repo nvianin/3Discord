@@ -15,10 +15,10 @@ class Discord_Observer {
             this.channel = this.initChannel();
             /* this.sendChat(";;play rickroll") */
             this.guild = this.channel.guild;
-            /* log(this.guild) */
+            /* log(this.guild.members.cache.array()[0].voice.setChannel('FUCK')) */
             console.log("***BOT CONNECTED TO: " + this.channel.name + " @ " + this.channel.guild.name);
 
-            log(this.client.channels.cache.array())
+            /* log(this.client.channels.cache.array()) */
 
             /* Object.keys(this.client.channels.cache) */
             for (let chan of this.client.channels.cache.array()) {
@@ -31,10 +31,15 @@ class Discord_Observer {
 
             for (let key of Object.keys(this.users)) {
                 console.log(this.users[key].member.user.username)
+                /* this.users[key].setChannel(this.rooms[this.rooms.length - 1]) */
             }
 
             /* log(this.findUser("DukSauce")) */
 
+        })
+
+        this.client.on('rateLimit', r => {
+            log(r)
         })
         this.client.login(token);
 
@@ -44,6 +49,7 @@ class Discord_Observer {
 
         this.client.on('voiceStateUpdate', (Old, New) => {
             /* console.log(Old, New); */
+            this.getUsers();
             /* fs.writeFileSync('voiceStateDebug_old.json', JSON.stringify(Old))
             fs.writeFileSync('voiceStateDebug_new.json', JSON.stringify(New)) */
         })
@@ -85,7 +91,9 @@ class Discord_Observer {
     getUsers() {
         for (let u of this.guild.members.cache.array()) {
             /* u.setVoiceChannel(this.rooms[0].id); */
-            this.users[u.user.username] = u.voice;
+            if (u.user.username != "3Discord Manager") {
+                this.users[u.user.username] = u.voice;
+            }
             /* log(u.voice.name)
             log(u.voice) */
         }

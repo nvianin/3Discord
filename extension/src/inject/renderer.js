@@ -15,8 +15,8 @@ let ground_tex
 texLoader.load(chrome.runtime.getURL('src/inject/assets/ground_tex.png'), texture => {
     console.log("TEXTURE LOADED");
     ground_tex = texture;
-    ground_tex.repeat.x = 10000
-    ground_tex.repeat.y = 10000
+    ground_tex.repeat.x = 1
+    ground_tex.repeat.y = 1
     ground_tex.wrapS = THREE.RepeatWrapping;
     ground_tex.wrapT = THREE.RepeatWrapping;
     console.log(ground_tex);
@@ -25,8 +25,8 @@ let wall_tex
 texLoader.load(chrome.runtime.getURL('src/inject/assets/wall_tex.png'), texture => {
     console.log("TEXTURE LOADED");
     wall_tex = texture;
-    wall_tex.repeat.x = 10000
-    wall_tex.repeat.y = 10000
+    wall_tex.repeat.x = 1
+    wall_tex.repeat.y = 1
     wall_tex.wrapS = THREE.RepeatWrapping;
     wall_tex.wrapT = THREE.RepeatWrapping;
     console.log(wall_tex);
@@ -111,6 +111,45 @@ debugCube.scale.set(.01, .01, .01)
 
 let shadowRes = 2048;
 
+let env_3d;
+
+let fxaa, SAO, copyPass, renderPass;
+
+setInterval(() => {
+    try {
+        if (stage.offsetHeight != document.getElementsByClassName("chat-3bRxxu")[0].offsetHeight ||
+            stage.offsetWidth != document.getElementsByClassName("chat-3bRxxu")[0].offsetWidth) {
+            stage.style.width = document.getElementsByClassName("chat-3bRxxu")[0].offsetWidth + "px"
+            stage.style.height = document.getElementsByClassName("chat-3bRxxu")[0].offsetHeight + "px"
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}, 1000)
+
+window.addEventListener('resize', () => {
+
+    camera.aspect = stage.offsetWidth / stage.offsetHeight;
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(stage.offsetWidth, stage.offsetHeight)
+    composer.setSize(stage.offsetWidth, stage.offsetHeight)
+
+    renderer.setPixelRatio(window.devicePixelRatio)
+    composer.setPixelRatio(window.devicePixelRatio)
+
+    const pixelRatio = renderer.getPixelRatio();
+    fxaa.material.uniforms['resolution'].value.x = 1 / (stage.offsetWidth * pixelRatio)
+    fxaa.material.uniforms['resolution'].value.y = 1 / (stage.offsetHeight * pixelRatio)
+
+    SAO.setSize(stage.offsetWidth, stage.offsetHeight)
+    copyPass.setSize(stage.offsetWidth, stage.offsetHeight)
+    renderPass.setSize(stage.offsetWidth, stage.offsetHeight)
+    fxaa.setSize(stage.offsetWidth, stage.offsetHeight)
+
+    console.log("HAHAHAHAHA")
+})
+
 const onstage = () => {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, stage.offsetWidth / stage.offsetHeight, 0.1, 1000);
@@ -120,17 +159,42 @@ const onstage = () => {
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.setSize(stage.offsetWidth, stage.offsetHeight);
+    renderer.setPixelRatio(window.devicePixelRatio)
     renderer.logarithmicDepthBuffer = false;
     stage.appendChild(renderer.domElement);
     renderer.domElement.classList.add("renderer")
 
-    /* 
-        composer = new THREE.EffectComposer(renderer);
+    composer = new THREE.EffectComposer(renderer);
+    composer.setPixelRatio(window.devicePixelRatio)
 
-        const renderPass = new THREE.RenderPass(scene, camera);
-        composer.addPass(renderPass);
-        const SAO = new THREE.SAOPass();
-        composer.addPass(SAO); */
+    renderPass = new THREE.RenderPass(scene, camera);
+    composer.addPass(renderPass);
+    SAO = new THREE.SAOPass(scene, camera, false, true);
+    SAO.setSize(stage.offsetWidth, stage.offsetHeight);
+    /* SAO.params.saoBlurRadius = 16;
+    SAO.params.saoIntensity = .0023
+    SAO.params.saoKernelRadius = 100;
+    SAO.params.saoScale = 3; */
+
+    SAO.params.saoBlurRadius = 16;
+    SAO.params.saoIntensity = .0008
+    SAO.params.saoKernelRadius = 50;
+    SAO.params.saoBlurStdDev = 5;
+    SAO.params.saoScale = 1;
+
+    composer.addPass(SAO);
+
+    fxaa = new THREE.ShaderPass(THREE.FXAAShader);
+    copyPass = new THREE.ShaderPass(THREE.CopyShader);
+
+    composer.addPass(copyPass)
+
+    const pixelRatio = renderer.getPixelRatio();
+
+    fxaa.material.uniforms['resolution'].value.x = 1 / (stage.offsetWidth * pixelRatio)
+    fxaa.material.uniforms['resolution'].value.y = 1 / (stage.offsetHeight * pixelRatio)
+
+    composer.addPass(fxaa)
 
     console.log("###########################")
     console.log("3D BACKGROUND INITIALIZED")
@@ -153,10 +217,14 @@ const onstage = () => {
     /* rectLight.castShadow = true; */
     /* scene.add(rectLight); */
     sun = new THREE.DirectionalLight(0xffffff, 1.);
-    sun.position.set(2, 10, 1);
-    sun.intensity = 1;
+    sun.position.set(2, 10, 10);
+    sun.intensity = .5
+    sun.shadow.normalBias = .01;
     sun.target = ground;
     sun.castShadow = true;
+
+    sun.shadow.mapSize.set(1024, 1024)
+
     sun.shadow.mapSize.width = shadowRes;
     sun.shadow.mapSize.height = shadowRes;
     scene.add(sun)

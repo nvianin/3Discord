@@ -1,0 +1,1 @@
+console.error("Error: Can't walk dependency graph: Cannot find module '@tensorflow/tfjs-core' from 'D:\\Projects\\_ecal\\ecal_Emojis\\3Discord\\extension\\src\\inject\\handpose.js'\n    required by D:\\Projects\\_ecal\\ecal_Emojis\\3Discord\\extension\\src\\inject\\handpose.js");

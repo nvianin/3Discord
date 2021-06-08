@@ -83,14 +83,18 @@ io.on('connect', socket => {
 
     socket.on('movement_registration', e => {
         /* console.log("***" + socket.c.name + " moved " + e.acceleration.x + ":" + e.acceleration.y); */
-        clients[socket.c.id].position = e.position;
-        clients[socket.c.id].acceleration = e.acceleration;
+        try {
+            clients[socket.c.id].position = e.position;
+            clients[socket.c.id].acceleration = e.acceleration;
 
-        io.sockets.emit('movement_registration', {
-            position: e.position,
-            acceleration: e.acceleration,
-            id: socket.c.id
-        });
+            io.sockets.emit('movement_registration', {
+                position: e.position,
+                acceleration: e.acceleration,
+                id: socket.c.id
+            });
+        } catch (e) {
+            console.log(e)
+        }
     })
 
 })
@@ -98,10 +102,11 @@ io.on('connect', socket => {
 const log = console.log;
 
 let frameCount = 0
+let prevGroups = ["haha"];
 
 function tick() {
     frameCount++;
-    let threshold = 2;
+    let threshold = 1;
 
     let keys = Object.keys(clients)
     for (key of keys) {
@@ -112,7 +117,7 @@ function tick() {
             let clientb = clients[key];
             if (client != clientb) {
                 let distance = Math.sqrt((Math.pow(client.position.x - clientb.position.x, 2) + Math.pow(client.position.y - clientb.position.y, 2)));
-                /* log(distance) */
+                log(distance)
                 if (distance < threshold) {
                     client.adjacents.push(clientb);
                 }
@@ -162,7 +167,9 @@ function tick() {
         }
     }
 
-    /* if (frameCount % 10 == 0) {
+
+
+    if (frameCount % 10 == 0 || true) {
         log("||||||||||||||||")
         for (let group of groups) {
             log("-------------")
@@ -171,19 +178,59 @@ function tick() {
             }
             log("---------------")
         }
-    } */
-    let i = 0
-    for (let group of groups) {
-        let channel = discordObserver.rooms[i]
-        /* for (let member of group) {
-            log(member)
-        } */
-
-        /* log(channel) */
-
-
-        i++;
     }
+
+    log(prevGroups == groups)
+    if (prevGroups != groups) {
+        let i = 0;
+        if (groups.length == 0) {
+
+            /* discordObserver.rooms.forEach(r => {
+                log(r.name)
+            }) */
+            /* console.log("NO GROUPS") */
+            for (key of Object.keys(discordObserver.users)) {
+                let channel = discordObserver.rooms[i]
+                /* console.log(channel) */
+                let client = discordObserver.users[key];
+                /* log(client.member.user.username) */
+                client.setChannel(channel.id)
+
+                log("moved " + client.member.user.username + " to channel " + channel.name)
+                i++
+            }
+        } else {
+            i = 0;
+            for (let group of groups) {
+                let channel = discordObserver.rooms[i]
+                for (let member of group) {
+                    for (key of Object.keys(discordObserver.users)) {
+                        let client = discordObserver.users[key];
+                        if (client.member.user.username == member.name) {
+                            /* log(member.name) */
+                            client.setChannel(channel.id)
+                            /* .then(a => (console.log("move success")), b => {
+                                console.log("move error")
+                                console.log(b)
+                            }) */
+                            log("moved " + client.member.user.username + " to channel " + channel.name)
+                        }
+                    }
+                }
+
+                /* log(channel) */
+
+
+                i++;
+            }
+        }
+    }
+    prevGroups = groups;
+
+    /* for (key of Object.keys(discordObserver.users)) {
+        discordObserver.users[key].setChannel(discordObserver.rooms[9])
+        log("ADGSF")
+    } */
 
 
     for (let key of Object.keys(discordObserver.users)) {
@@ -192,4 +239,4 @@ function tick() {
     }
 }
 
-setInterval(tick, 100);
+setInterval(tick, 4000);

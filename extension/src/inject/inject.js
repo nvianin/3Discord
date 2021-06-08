@@ -148,7 +148,7 @@ chrome.extension.sendMessage({}, function (response) {
 				if (e.classList.toString().includes('chat')) {
 					/* console.log(e); */
 					if (e.parentElement.classList.toString().includes('content')) {
-						receiveChatElement(e)
+						receiveChatElement(e.parentElement)
 					}
 				};
 				if (e.classList.toString().includes('videoControls')) {
@@ -180,7 +180,7 @@ chrome.extension.sendMessage({}, function (response) {
 						/* videos.push(mutation.target)
 						console.log(videos) */
 					}
-					if (mutation.target.classList.toString().includes('chat') && !stage) {
+					if (mutation.target.classList.toString().includes('content') && !stage) {
 						/* console.log(mutation.target); */
 						console.log("CHAT FOUND IN MUTATION")
 						/* stage = mutation.target; */
@@ -522,6 +522,8 @@ const resize = () => {
 	/* console.log(stage.offsetWidth, stage.offsetHeight) */
 	if (stage) {
 		stageRect = stage.getBoundingClientRect();
+		stage.style.width = document.getElementsByClassName("chat-3bRxxu")[0].offsetWidth + "px"
+		stage.style.height = document.getElementsByClassName("chat-3bRxxu")[0].offsetHeight + "px"
 	}
 	try {
 		camera.aspect = stage.offsetWidth / stage.offsetHeight;
@@ -539,6 +541,9 @@ let dt = 0;
 let then, now;
 then = now = Date.now();
 
+let physicsRaycaster = new THREE.Raycaster();
+physicsRaycaster.far = .01
+
 function render() {
 	now = Date.now();
 	dt = (now - then) / 10;
@@ -549,8 +554,8 @@ function render() {
 
 	try {
 		if (renderer) {
-			renderer.render(scene, camera);
-			/* composer.render(); */
+			/* renderer.render(scene, camera); */
+			composer.render();
 		}
 	} catch {}
 
@@ -572,7 +577,18 @@ function render() {
 			let min_dist = 100;
 			let max_dist = Math.min(300, (stage.offsetWidth / 4) - 30);
 
+			physicsRaycaster.origin = avatar.object.position;
+			let physics_intersects;
+			for (let t = 0; t < 360; t += 360 / 4) {
+				physicsRaycaster.direction = new THREE.Vector3(Math.cos(t), Math.sin(t), .1)
+				let current_intersects = physicsRaycaster.intersectObjects(scene.children);
+				if (current_intersects != undefined) {
+					physics_intersects += current_intersects;
+				}
+			}
+
 			if (screen_mouse.length() > min_dist && mouseIsOnScreen) {
+
 				let force = Math.max(Math.min((screen_mouse.length() - min_dist) / max_dist, 1), 0);
 				/* if (frameCount % 10 == 0) console.log(force); */
 				force = mouse.clone().sub(avatar.object.position).multiplyScalar(force * dt * .001);
@@ -644,12 +660,25 @@ function render() {
 
 	then = now;
 	requestAnimationFrame(render);
+
+
+	if (frameCount % 100 == 0) {
+		stage.style.width = document.getElementsByClassName("chat-3bRxxu")[0].offsetWidth + "px"
+		stage.style.height = document.getElementsByClassName("chat-3bRxxu")[0].offsetHeight + "px"
+	}
 }
 
 render()
 
 function fetchUsers() {
-	var pictures = document.getElementsByClassName("avatarWrapper-29j3CC");
+	let pictures = []
+	let targetClassNames = ['avatarWrapper-29j3CC', ]
+	for (let className of targetClassNames) {
+		for (let e of document.getElementsByClassName(className)) {
+			pictures.push(e);
+		}
+	}
+	/* var pictures = document.getElementsByClassName("avatarWrapper-29j3CC"); */
 	let userPics = {}
 	for (pic of pictures) {
 		userPics[pic.ariaLabel] = pic.getElementsByTagName('img')[0].src;

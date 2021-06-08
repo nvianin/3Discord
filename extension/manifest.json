@@ -38,7 +38,18 @@
         "src/inject/avatar.js",
         "src/inject/inject.js",
         "src/inject/renderer.js",
-        "src/inject/wall.js"
+        "src/inject/wall.js",
+
+        "src/inject/threejs/EffectComposer.js",
+        "src/inject/threejs/RenderPass.js",
+        "src/inject/threejs/SAOPass.js",
+        "src/inject/threejs/ShaderPass.js",
+
+        "src/inject/threejs/CopyShader.js",
+        "src/inject/threejs/FXAAShader.js",
+        "src/inject/threejs/SAOShader.js",
+        "src/inject/threejs/DepthLimitedBlurShader.js",
+        "src/inject/threejs/UnpackDepthRGBAShader.js"
       ]
     }
   ],
