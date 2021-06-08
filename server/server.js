@@ -11,6 +11,8 @@ const server = https.createServer({
     res.end('hello world\n');
 }).listen(80);
 
+let radioEnabled = false;
+
 let clients = {};
 
 const io = require('socket.io')(server, {
@@ -39,6 +41,8 @@ io.on('connect', socket => {
             position: c.position,
             name: c.name
         })
+
+        socket.emit('radioUpdate', radioEnabled)
     }
 
     socket.on('disconnect', e => {
@@ -53,6 +57,7 @@ io.on('connect', socket => {
             console.log("<<- disconnection but name unavailable")
         }
     })
+
 
     socket.on('id_attribution', e => {
         console.log("***ID ATTRIBUTION FROM " + e.name)
@@ -95,6 +100,12 @@ io.on('connect', socket => {
         } catch (e) {
             console.log(e)
         }
+    })
+
+    socket.on('radio_toggle', () => {
+        radioEnabled = !radioEnabled;
+        io.sockets.emit('radioUpdate', radioEnabled);
+        console.log("***RADIO STATE SWITCHED TO " + radioEnabled)
     })
 
 })
@@ -194,9 +205,14 @@ function tick() {
                 /* console.log(channel) */
                 let client = discordObserver.users[key];
                 /* log(client.member.user.username) */
-                client.setChannel(channel.id)
-
-                log("moved " + client.member.user.username + " to channel " + channel.name)
+                try {
+                    if (client.channel.id != channel.id) {
+                        client.setChannel(channel.id)
+                        log("moved " + client.member.user.username + " to channel " + channel.name)
+                    }
+                } catch (e) {
+                    console.log(e)
+                }
                 i++
             }
         } else {
@@ -208,12 +224,18 @@ function tick() {
                         let client = discordObserver.users[key];
                         if (client.member.user.username == member.name) {
                             /* log(member.name) */
-                            client.setChannel(channel.id)
+                            try {
+                                if (client.channel.id != channel.id) {
+                                    client.setChannel(channel.id)
+                                    log("moved " + client.member.user.username + " to channel " + channel.name)
+                                }
+                            } catch (e) {
+                                console.log(e)
+                            }
                             /* .then(a => (console.log("move success")), b => {
-                                console.log("move error")
+                                console.log("move error")y
                                 console.log(b)
                             }) */
-                            log("moved " + client.member.user.username + " to channel " + channel.name)
                         }
                     }
                 }
@@ -239,4 +261,4 @@ function tick() {
     }
 }
 
-setInterval(tick, 4000);
+setInterval(tick, 2500);

@@ -200,7 +200,7 @@ class Avatar {
             this.object.children[1].material = new THREE.MeshBasicMaterial({
                 map: new THREE.VideoTexture(this.video)
             });
-            this.object.children[1].geometry.attributes.uv = this.object.videoUV
+            /* this.object.children[1].geometry.attributes.uv = this.object.videoUV */
             /* this.object.children[1].material = new THREE.MeshBasicMaterial({
                 color: 0xff0000
             }) */

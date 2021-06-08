@@ -10,13 +10,15 @@ if (stage) {
     }, 200)
 }
 
+window.devicePixelRatio = 1;
+
 const texLoader = new THREE.TextureLoader();
 let ground_tex
 texLoader.load(chrome.runtime.getURL('src/inject/assets/ground_tex.png'), texture => {
     console.log("TEXTURE LOADED");
     ground_tex = texture;
-    ground_tex.repeat.x = 1
-    ground_tex.repeat.y = 1
+    ground_tex.repeat.x = 1000
+    ground_tex.repeat.y = 1000
     ground_tex.wrapS = THREE.RepeatWrapping;
     ground_tex.wrapT = THREE.RepeatWrapping;
     console.log(ground_tex);
@@ -34,6 +36,7 @@ texLoader.load(chrome.runtime.getURL('src/inject/assets/wall_tex.png'), texture 
 
 let scene, camera, renderer, composer;
 let ground, groundShadingMat, groundShadingPlane;
+/* let radio; */
 let ambientLight, light, hemi, rectLight, sun;
 
 const loader = new THREE.GLTFLoader();
@@ -237,6 +240,15 @@ const onstage = () => {
     let url = chrome.runtime.getURL("src/inject/assets/Coop_Space_3.glb");
     console.log(url)
 
+    /* loader.load(chrome.runtime.getURL("src/inject/assets/radio.glb"), gltf => {
+        radio = gltf.scene;
+        console.log(radio)
+
+        radio.scale.set(.1, .1, .1)
+
+        scene.add(radio)
+    }) */
+
 
 
     loader.load(url, gltf => {
@@ -248,6 +260,12 @@ const onstage = () => {
         gltf.scene.rotation.x = Math.PI / 2;
         gltf.scene.rotation.y = -Math.PI / 2
         scene.add(gltf.scene);
+
+        radio = []
+
+        for (let c of gltf.scene.getObjectByName("radio").children) {
+            radio.push(c)
+        }
 
         let materials = getMats()
         for (mat of materials) {

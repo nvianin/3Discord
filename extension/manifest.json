@@ -40,6 +40,8 @@
         "src/inject/renderer.js",
         "src/inject/wall.js",
 
+        "src/inject/radio.js",
+
         "src/inject/threejs/EffectComposer.js",
         "src/inject/threejs/RenderPass.js",
         "src/inject/threejs/SAOPass.js",

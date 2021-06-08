@@ -9,6 +9,10 @@ var avatar;
 
 let clients = {};
 
+let mousePressed = false;
+
+let foundRadio = false;
+
 let pageLoaded = false;
 let AttributionCallback = null;
 
@@ -79,6 +83,32 @@ socket.on('movement_registration', e => {
 	} catch (e) {
 		console.log(e);
 	}
+})
+
+const onPlayerReady = e => {
+	for (let i = 0; i < 100; i++) console.log(e);
+
+}
+
+const updateRadio = (radioEnabled, retries = 0) => {
+	try {
+		console.log("radio update: " + radioEnabled)
+		let v = document.getElementsByTagName('iframe')[0]
+		if (radioEnabled) {
+			v.src = v.baseURL + "&autoplay=1"
+		} else {
+			v.src = v.baseURL + "&autoplay=0"
+		}
+	} catch (e) {
+		console.log(e)
+		if (retries < 3) {
+			setTimeOut(updateRadio(radioEnabled, retries++), 800)
+		}
+	}
+}
+
+socket.on('radioUpdate', radioEnabled => {
+	updateRadio(radioEnabled)
 })
 
 function sendAttribution() {
@@ -517,6 +547,7 @@ let prevDims = {
 	x: 0,
 	y: 0
 }
+let radio
 
 const resize = () => {
 	/* console.log(stage.offsetWidth, stage.offsetHeight) */
@@ -544,11 +575,15 @@ then = now = Date.now();
 let physicsRaycaster = new THREE.Raycaster();
 physicsRaycaster.far = .01
 
+let radioTimeOut = 0;
+
 function render() {
 	now = Date.now();
 	dt = (now - then) / 10;
 	frameCount++;
 
+
+	radioTimeOut++;
 
 	if (prevDims.x != window.innerWidth || prevDims.y != window.innerHeight) resize()
 
@@ -565,15 +600,55 @@ function render() {
 	try {
 		if (camera) {
 			raycaster.setFromCamera(normalized_mouse, camera);
-			const intersects = raycaster.intersectObjects([ground]);
+			const intersects = raycaster.intersectObjects([ground].concat(radio));
+			scene.getObjectByName()
 			if (intersects[0]) {
 				mouse.x = intersects[0].point.x;
 				mouse.y = intersects[0].point.y;
 				debugCube.position.x = mouse.x
 				debugCube.position.y = mouse.y
 				debugCube.position.z = intersects[0].point.z;
+
+				if (frameCount % 100 == 0) {
+					/* console.log(intersects.length, intersects)
+					console.log(radio) */
+				}
 			}
 
+			let radioParts = 0;
+			for (let intersect of intersects) {
+				try {
+					/* console.log(intersect.object) */
+					if (intersect.object.parent.name == "radio") {
+						/* foundRadio = true */
+						radioParts++;
+					} else {
+						/* foundRadio = false; */
+					}
+				} catch (e) {
+					/* console.log(e) */
+					/* foundRadio = false; */
+				}
+
+				if (radioParts > 0) {
+					foundRadio = true
+				} else {
+					foundRadio = false;
+				}
+
+				if (foundRadio) {
+					if (radioTimeOut > 200) {
+						document.body.style.cursor = "pointer"
+						console.log(intersect.object.parent)
+						if (mousePressed) {
+							socket.emit('radio_toggle')
+							radioTimeOut = 0;
+						}
+					}
+				} else {
+					document.body.style.cursor = "default"
+				}
+			}
 			let min_dist = 100;
 			let max_dist = Math.min(300, (stage.offsetWidth / 4) - 30);
 
@@ -663,9 +738,13 @@ function render() {
 
 
 	if (frameCount % 100 == 0) {
-		stage.style.width = document.getElementsByClassName("chat-3bRxxu")[0].offsetWidth + "px"
-		stage.style.height = document.getElementsByClassName("chat-3bRxxu")[0].offsetHeight + "px"
+		try {
+			stage.style.width = document.getElementsByClassName("chat-3bRxxu")[0].offsetWidth + "px"
+			stage.style.height = document.getElementsByClassName("chat-3bRxxu")[0].offsetHeight + "px"
+		} catch {}
 	}
+
+	mousePressed = false;
 }
 
 render()
@@ -684,6 +763,13 @@ function fetchUsers() {
 		userPics[pic.ariaLabel] = pic.getElementsByTagName('img')[0].src;
 	}
 	return userPics;
+}
+
+onpointerdown = () => {
+	mousePressed = true;
+}
+onpointerup = () => {
+	mousePressed = false;
 }
 
 console.log(fetchUsers);
