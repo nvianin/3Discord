@@ -12,6 +12,10 @@ fuckingloader.load(chrome.runtime.getURL('src/inject/assets/portrait.glb'), gltf
     console.log(gltf.scene)
 })
 
+let thumbs_up = "👍";
+let thumbs_down = "👎"
+let victory = "✌️"
+
 class Avatar {
     constructor(x = 0, y = 0, name, client = false) {
         /* this.dom = document.createElement("div");
@@ -31,6 +35,8 @@ class Avatar {
         this.video_material = new THREE.MeshBasicMaterial();
         this.video_material.name = this.name + " video";
         this.object.children[1].material = this.video_material;
+
+        this.animationIsPlaying = false;
 
         /* if (this.object.children[1].attributes) {
             this.object.pictureUV = this.object.children[1].attributes.uv2
@@ -222,5 +228,55 @@ class Avatar {
             setTimeout(this.initVideo, 200);
             console.log(e);
         } */
+    }
+    emoji_animation(emoji) {
+        let img
+        switch (emoji) {
+            case "thumbs_up":
+                img = thumbs_up
+                break;
+            case "thumbs_down":
+                img = thumbs_down
+                break;
+            case "victory":
+                img = victory
+                break;
+        }
+        if (img != undefined) {
+            let div = document.createElement('div');
+            div.classList.add("emoji_animation");
+            div.innerText = img;
+            div.style.zIndex = 10000
+            div.style.position = "absolute"
+            div.style.right = "100px"
+            div.style.top = "100px"
+            document.body.appendChild(div);
+            setTimeout(() => {
+                div.style.fontSize = "20pt"
+            }, 50)
+            setTimeout(() => {
+                div.style.fontSize = "0pt"
+            }, 2000)
+            setTimeout(() => {
+                clearInterval(this.updateLoop)
+                document.body.removeChild(div);
+            }, 3000)
+
+            this.updateLoop = setInterval(() => {
+                let screenspace_position = this.object.position.clone();
+                screenspace_position.project(camera);
+
+                let x = (screenspace_position.x * stage.offsetWidth / 2) + stage.offsetWidth / 2;
+                let y = -(screenspace_position.y * stage.offsetHeight / 2) + stage.offsetHeight / 2;
+
+                div.style.left = x + "px"
+                div.style.top = y + "px"
+
+                /* console.log(div.style.right, div.style.top) */
+            }, 50)
+
+        } else {
+            console.error("  " + emoji + " is not a valid emoji.")
+        }
     }
 }

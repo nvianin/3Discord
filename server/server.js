@@ -41,8 +41,6 @@ io.on('connect', socket => {
             position: c.position,
             name: c.name
         })
-
-        socket.emit('radioUpdate', radioEnabled)
     }
 
     socket.on('disconnect', e => {
@@ -63,6 +61,7 @@ io.on('connect', socket => {
         console.log("***ID ATTRIBUTION FROM " + e.name)
         socket.c = new Client(e.name, socket, clients);
         socket.emit('id_attribution', socket.c.id);
+        socket.emit('radioUpdate', radioEnabled)
         /* io.sockets.emit('client_joined', {
             id: socket.c.id,
             position: socket.c.position,

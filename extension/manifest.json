@@ -41,6 +41,7 @@
         "src/inject/wall.js",
 
         "src/inject/radio.js",
+        "src/inject/handpose-bundle.js",
 
         "src/inject/threejs/EffectComposer.js",
         "src/inject/threejs/RenderPass.js",

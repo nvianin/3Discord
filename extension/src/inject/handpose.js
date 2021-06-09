@@ -9,33 +9,56 @@ const fp = require("fingerpose");
 let video = document.createElement('video')
 video.autoplay = true;
 video.id = "self_webcam"
-
+video.style.userSelect = "none"
+video.style.pointerEvents = "none"
+video.zIndex = -100000;
 document.body.appendChild(video);
 
-video.style.right = 1000000 + "px"
+video.style.right = 1 /* 000000 */ + "px"
 
 if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({
             video: true
         })
         .then(stream => {
-            vid.srcObject = stream
+            video.srcObject = stream
+            console.info("CAMERA INITIALIZED")
+            handposeEstimator = new HandPoseEstimator();
         })
         .catch(err => {
-            console.log(err);
+            console.error(err);
         })
+} else {
+    console.error("Camera intialization failed !")
 }
 
 class HandPoseEstimator {
     constructor() {
+
+        this.active = true;
+
+        this.onThumbsDown = () => {
+            console.log("Thumbs DOWN")
+            avatar.emoji_animation('thumbs_down')
+        }
+        this.onThumbsUp = () => {
+            console.log("Thumbs UP")
+            avatar.emoji_animation('thumbs_up')
+        }
+        this.onVictory = () => {
+            console.log("Victory")
+            avatar.emoji_animation('victory')
+        }
 
         const runHandpose = async () => {
             const net = await handpose.load();
             // console.log("Handpose model loaded.");
             //  Loop and detect hands
             setInterval(() => {
-                detect(net);
-            }, 100);
+                if (this.active) {
+                    detect(net);
+                }
+            }, 1000);
         };
 
         const detect = async (net) => {
@@ -61,18 +84,32 @@ class HandPoseEstimator {
                     const maxConfidence = confidence.indexOf(
                         Math.max.apply(null, confidence)
                     );
+
+                    switch (gesture.gestures[0].name) {
+                        case "victory":
+                            this.onVictory();
+                            break;
+                        case "thumbs_up":
+                            if (gesture.poseData[0][2].toLowerCase().includes("up")) {
+                                this.onThumbsUp();
+                            } else if (gesture.poseData[0][2].toLowerCase().includes("down")) {
+                                this.onThumbsDown();
+                            }
+                            break;
+                    }
+
                     /* setEmoji(gesture.gestures[maxConfidence].name); */
                     /* console.log(gesture.gestures) */
-                    for (g of gesture.gestures) {
+                    /* for (let g of gesture.gestures) {
                         console.log(g)
-                    }
+                    } */
                     /* console.log(emoji); */
                 }
             }
 
             // Draw mesh
-            const ctx = document.getElementsByTagName("canvas")[0].getContext("2d");
-            drawHand(hand, ctx);
+            /* const ctx = document.getElementsByTagName("canvas")[0].getContext("2d");
+            drawHand(hand, ctx); */
 
         };
 

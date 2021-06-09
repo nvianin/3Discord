@@ -16,6 +16,8 @@ let foundRadio = false;
 let pageLoaded = false;
 let AttributionCallback = null;
 
+let handposeEstimator;
+
 let url = "3discord.ddns.net"
 /* url = "192.168.15.191"
 url = "172.19.46.12" */
@@ -91,6 +93,7 @@ const onPlayerReady = e => {
 }
 
 const updateRadio = (radioEnabled, retries = 0) => {
+	console.log("UPDATING THE RADIO")
 	try {
 		console.log("radio update: " + radioEnabled)
 		let v = document.getElementsByTagName('iframe')[0]
@@ -147,6 +150,13 @@ function createStats() {
 
 	return stats;
 }
+
+window.addEventListener('keypress', key => {
+	if (key.key == " ") {
+		handposeEstimator.active = !handposeEstimator.active
+		console.log("handpose: " + handposeEstimator.active);
+	}
+})
 
 
 
