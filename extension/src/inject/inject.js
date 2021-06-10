@@ -89,6 +89,7 @@ socket.on('movement_registration', e => {
 
 socket.on('emoji_trigger', e => {
 	if (e.id != avatar.id) {
+		console.log(clients[e.id].name + " triggered animation " + e.emoji)
 		clients[e.id].emoji_animation(e.emoji);
 	}
 })

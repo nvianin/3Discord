@@ -230,6 +230,11 @@ class Avatar {
         } */
     }
     emoji_animation(emoji) {
+        if (this.client) {
+            socket.emit('emoji_trigger', emoji);
+        }
+
+
         let img
         switch (emoji) {
             case "thumbs_up":
@@ -295,6 +300,6 @@ class Avatar {
     }
 }
 
-window.addEventListener('click', () => {
+/* window.addEventListener('click', () => {
     avatar.emoji_animation("victory")
-})
+}) */
