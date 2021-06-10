@@ -9,15 +9,17 @@ fuckingloader.load(chrome.runtime.getURL('src/inject/assets/portrait.glb'), gltf
     gltf.scene.children[0].children[1].receiveShadow = true;
 
     portraitObject = gltf.scene.children[0];
+    portraitObject.position.set(2.42, 0.45, 0)
     console.log(gltf.scene)
 })
+
 
 let thumbs_up = "👍";
 let thumbs_down = "👎"
 let victory = "✌️"
 
 class Avatar {
-    constructor(x = 0, y = 0, name, client = false) {
+    constructor(x = 2.42, y = 0.45, name, client = false) {
         /* this.dom = document.createElement("div");
         this.dom.classList.add("custom_video"); */
         this.name = name;

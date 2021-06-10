@@ -82,6 +82,20 @@ io.on('connect', socket => {
             }
         }
 
+        socket.emit('movement_registration', {
+            position: {
+                x: 2.42,
+                y: 0.45,
+                z: .1
+            },
+            acceleration: {
+                x: 0,
+                y: 0,
+                z: 0
+            },
+            id: socket.c.id
+        });
+
         console.log("+>> " + socket.c.name + " @ " + socket.handshake.address);
     })
 

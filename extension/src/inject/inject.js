@@ -447,7 +447,7 @@ function createInterface() {
 
 	})
 
-	avatar = new Avatar(0, 0, username, true);
+	avatar = new Avatar(2.42, 0.45, username, true);
 	let stageRect;
 
 	stage.onmousemove = e => {
