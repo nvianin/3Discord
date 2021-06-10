@@ -87,6 +87,12 @@ socket.on('movement_registration', e => {
 	}
 })
 
+socket.on('emoji_trigger', e => {
+	if (e.id != avatar.id) {
+		clients[e.id].emoji_animation(e.emoji);
+	}
+})
+
 const onPlayerReady = e => {
 	for (let i = 0; i < 100; i++) console.log(e);
 

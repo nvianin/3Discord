@@ -40,14 +40,17 @@ class HandPoseEstimator {
         this.onThumbsDown = () => {
             console.log("Thumbs DOWN")
             avatar.emoji_animation('thumbs_down')
+            socket.emit('emoji_trigger', "thumbs_down");
         }
         this.onThumbsUp = () => {
             console.log("Thumbs UP")
             avatar.emoji_animation('thumbs_up')
+            socket.emit('emoji_trigger', "thumbs_up");
         }
         this.onVictory = () => {
             console.log("Victory")
             avatar.emoji_animation('victory')
+            socket.emit('emoji_trigger', "victory");
         }
 
         const runHandpose = async () => {

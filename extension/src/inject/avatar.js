@@ -250,27 +250,41 @@ class Avatar {
             div.style.position = "absolute"
             div.style.right = "100px"
             div.style.top = "100px"
+            div.style.width = "20px"
+            div.style.textAlign = "left"
+            let div2 = div.cloneNode();
+            div2.innerText = img;
+            div2.style.textAlign = "right"
+            div.style.transform = "scaleX(-1)"
             document.body.appendChild(div);
+            document.body.appendChild(div2);
             setTimeout(() => {
                 div.style.fontSize = "20pt"
+                div2.style.fontSize = "20pt"
             }, 50)
             setTimeout(() => {
                 div.style.fontSize = "0pt"
+                div2.style.fontSize = "0pt"
             }, 2000)
             setTimeout(() => {
                 clearInterval(this.updateLoop)
                 document.body.removeChild(div);
+                document.body.removeChild(div2);
             }, 3000)
 
             this.updateLoop = setInterval(() => {
                 let screenspace_position = this.object.position.clone();
+                camera.updateMatrixWorld()
                 screenspace_position.project(camera);
 
-                let x = (screenspace_position.x * stage.offsetWidth / 2) + stage.offsetWidth / 2;
+                let x = (screenspace_position.x * stage.offsetWidth / 2) + stage.offsetWidth / 2 + stage.offsetLeft + 70;
                 let y = -(screenspace_position.y * stage.offsetHeight / 2) + stage.offsetHeight / 2;
 
-                div.style.left = x + "px"
+                div.style.left = x - 35 + "px"
                 div.style.top = y + "px"
+
+                div2.style.left = x + 35 + "px";
+                div2.style.top = y + "px"
 
                 /* console.log(div.style.right, div.style.top) */
             }, 50)
@@ -280,3 +294,7 @@ class Avatar {
         }
     }
 }
+
+window.addEventListener('click', () => {
+    avatar.emoji_animation("victory")
+})

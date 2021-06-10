@@ -101,6 +101,14 @@ io.on('connect', socket => {
         }
     })
 
+    socket.on('emoji_trigger', emoji => {
+        console.log(socket.c.name + " triggered emoji " + emoji)
+        io.sockets.emit('emoji_trigger', {
+            id: socket.c.id,
+            emoji: emoji
+        })
+    })
+
     socket.on('radio_toggle', () => {
         radioEnabled = !radioEnabled;
         io.sockets.emit('radioUpdate', radioEnabled);
